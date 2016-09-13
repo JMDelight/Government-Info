@@ -9,7 +9,7 @@
 @foreach (var query in Model)
 {
     <h3><a href="@Url.Action("Details", new { id = query.QueryId })">@query.Description</a></h3>
-    <p>Asked by: <a href="@Url.Action("Details", new { area = "User" }, new { id = query.UserId })">@query.User.UserName</a></p>
+    <p>Asked by: <a asp-controller="User" asp-action="Details" asp-route-id="@query.UserId"> @query.User.UserName</a></p>
 }
 
 <p>@Html.ActionLink("Add new query", "Create")</p>
