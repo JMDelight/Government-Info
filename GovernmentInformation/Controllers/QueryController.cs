@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using GovernmentInformation.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -21,6 +22,7 @@ namespace GovernmentInformation.Controllers
 
         public IActionResult Create()
         {
+            ViewBag.Users = db.Users.ToList();
             return View();
         }
         [HttpPost]
@@ -34,7 +36,7 @@ namespace GovernmentInformation.Controllers
         public IActionResult Details(int id)
         {
             var thisQuery = db.Queries.FirstOrDefault(query => query.QueryId == id);
-            var queriesUser = db.Users.Where(user => user.UserId == thisQuery.UserId);
+            var queriesUser = db.Users.FirstOrDefault(user => user.UserId == thisQuery.UserId);
             Dictionary<string, object> model = new Dictionary<string, object> { };
             model.Add("query", thisQuery);
             model.Add("user", queriesUser);
@@ -44,6 +46,7 @@ namespace GovernmentInformation.Controllers
 
         public IActionResult Edit(int id)
         {
+            ViewBag.Users = db.Users.ToList();
             var thisQuery = db.Queries.FirstOrDefault(query => query.QueryId == id);
             return View(thisQuery);
         }

@@ -1,0 +1,36 @@
+﻿@model GovernmentInformation.Models.Query
+@{
+    ViewData["Title"] = "Add New Query";
+}
+
+<h2>Create</h2>
+<hr />
+<h4>Add a new user</h4>
+<form method="post">
+    <div class="form-group">
+        <input type="hidden" asp-for="QueryId" value="@Model.QueryId"/>
+        <label asp-for="Description" class="control-label"></label>
+        <input asp-for="Description" class="form-control" />
+    </div>
+    <div class="form-group">
+        <select asp-for="UserId">
+            @foreach (var user in ViewBag.Users)
+            {
+                @if (user.UserId == Model.UserId)
+                {
+                    <option selected value="@user.UserId">@user.UserName</option>
+                }
+                else
+                {
+                    <option value="@user.UserId">@user.UserName</option>
+                }
+            }
+
+        </select>
+
+    </div>
+    <div>
+        <button class="btn btn-lg btn-success">Save</button>
+    </div>
+</form>
+<p>@Html.ActionLink("Back to query list", "Index")</p>
