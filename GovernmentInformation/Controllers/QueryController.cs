@@ -4,18 +4,19 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using GovernmentInformation.Models;
+using Microsoft.EntityFrameworkCore;
 
 // For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace GovernmentInformation.Controllers
 {
-    public class UserController : Controller
+    public class QueryController : Controller
     {
-        // GET: /<controller>/
         private GovernmentInformationDbContext db = new GovernmentInformationDbContext();
         public IActionResult Index()
         {
-            return View(db.Users.ToList());
+            return View(db.Queries.Include(queries => queries.User).ToList());
+            
         }
 
         public IActionResult Create()
@@ -23,47 +24,47 @@ namespace GovernmentInformation.Controllers
             return View();
         }
         [HttpPost]
-        public IActionResult Create(User user)
+        public IActionResult Create(Query query)
         {
-            db.Users.Add(user);
+            db.Queries.Add(query);
             db.SaveChanges();
             return RedirectToAction("Index");
         }
 
         public IActionResult Details(int id)
         {
-            var thisUser = db.Users.FirstOrDefault(user => user.UserId == id);
-            var userQueries = db.Queries.Where(query => query.UserId == id);
+            var thisQuery = db.Queries.FirstOrDefault(query => query.QueryId == id);
+            var queriesUser = db.Users.Where(user => user.UserId == thisQuery.UserId);
             Dictionary<string, object> model = new Dictionary<string, object> { };
-            model.Add("user", thisUser);
-            model.Add("queries", userQueries);
+            model.Add("query", thisQuery);
+            model.Add("user", queriesUser);
             return View(model);
 
         }
 
         public IActionResult Edit(int id)
         {
-            var thisUser = db.Users.FirstOrDefault(user => user.UserId == id);
-            return View(thisUser);
+            var thisQuery = db.Queries.FirstOrDefault(query => query.QueryId == id);
+            return View(thisQuery);
         }
         [HttpPost]
-        public IActionResult Edit(User user)
+        public IActionResult Edit(Query query)
         {
-            db.Entry(user).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
+            db.Entry(query).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
             db.SaveChanges();
             return RedirectToAction("Index");
         }
 
         public IActionResult Delete(int id)
         {
-            var thisUser = db.Users.FirstOrDefault(user => user.UserId == id);
-            return View(thisUser);
+            var thisQuery = db.Queries.FirstOrDefault(query => query.QueryId == id);
+            return View(thisQuery);
         }
         [HttpPost]
-        public IActionResult Delete(User deletedUser)
+        public IActionResult Delete(Query deletedQuery)
         {
-            var thisUser = db.Users.FirstOrDefault(user => user.UserId == deletedUser.UserId);
-            db.Users.Remove(thisUser);
+            var thisQuery = db.Queries.FirstOrDefault(query => query.QueryId == deletedQuery.QueryId);
+            db.Queries.Remove(thisQuery);
             db.SaveChanges();
             return RedirectToAction("Index");
         }
