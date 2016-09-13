@@ -1,0 +1,19 @@
+﻿@model GovernmentInformation.Models.User
+@{
+    ViewData["Title"] = "Edit User";
+}
+
+<h2>Create</h2>
+<hr />
+<h4>Add a new location</h4>
+<form method="post">
+    <input asp-for="UserId" type="hidden" value="@Model.UserId" />
+    <div class="form-group">
+        <label asp-for="UserName" class="control-label"></label>
+        <input asp-for="UserName" class="form-control" value="@Model.UserName" />
+    </div>
+    <div>
+        <button class="btn btn-lg btn-success">Save</button>
+    </div>
+</form>
+<p>@Html.ActionLink("Back to user list", "Index")</p>

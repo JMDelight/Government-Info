@@ -14,12 +14,20 @@ namespace GovernmentInformation.Models
 
     public GovernmentInformationDbContext(DbContextOptions<GovernmentInformationDbContext> options)
             : base(options)
-        {
+    {
+    }
+
+    public GovernmentInformationDbContext()
+    {
     }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
       base.OnModelCreating(builder);
     }
-  }
+        protected override void OnConfiguring(DbContextOptionsBuilder options)
+        {
+            options.UseSqlServer(@"Server=(localdb)\mssqllocaldb;Database=GovernmentInformation;integrated security=True");
+        }
+    }
 }

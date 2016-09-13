@@ -1,0 +1,11 @@
+﻿<h1>@Model["user"].UserName</h1>
+<h4>Stored Queries:</h4>
+<ul>
+    @foreach (var query in Model["queries"])
+    {
+    <li>@query.Description</li>
+    }
+</ul>
+
+<p><a href="@Url.Action("Edit", new { id = Model["user"].UserId })">Edit User Name</a></p>
+<p><a href="@Url.Action("Delete", new { id = Model["user"].UserId })">Delete this account</a></p>
