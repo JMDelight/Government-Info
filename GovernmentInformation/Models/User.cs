@@ -9,7 +9,7 @@ namespace GovernmentInformation.Models
     public class User
     {
     [Key]
-    public int CategoryId { get; set; }
+    public int UserId { get; set; }
     public string UserName { get; set; }
     public virtual ICollection<Query> Queries { get; set; }
 
