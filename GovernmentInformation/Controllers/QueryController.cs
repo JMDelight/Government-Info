@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using GovernmentInformation.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
+using System.Security.Claims;
 
 // For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -13,62 +15,69 @@ namespace GovernmentInformation.Controllers
 {
     public class QueryController : Controller
     {
-        private GovernmentInformationDbContext db = new GovernmentInformationDbContext();
-        public IActionResult Index()
+        private readonly ApplicationDbContext _db;
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly SignInManager<ApplicationUser> _signInManager;
+
+        public QueryController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, ApplicationDbContext db)
         {
-            return View(db.Queries.Include(queries => queries.User).ToList());
-            
+            _userManager = userManager;
+            _signInManager = signInManager;
+            _db = db;
+        }
+        public async Task<IActionResult> Index()
+        {
+            var userId = this.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var currentUser = await _userManager.FindByIdAsync(userId);
+            return View(_db.Queries.Where(queries => queries.User.Id == currentUser.Id).ToList());           
         }
 
         public IActionResult Create()
         {
-            ViewBag.Users = db.Users.ToList();
             return View();
         }
         [HttpPost]
-        public IActionResult Create(Query query)
+        public async Task<IActionResult> Create(Query query)
         {
-            db.Queries.Add(query);
-            db.SaveChanges();
+            var userId = this.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var currentUser = await _userManager.FindByIdAsync(userId);
+            query.User = currentUser;
+            _db.Queries.Add(query);
+            _db.SaveChanges();
             return RedirectToAction("Index");
         }
 
         public IActionResult Details(int id)
         {
-            var thisQuery = db.Queries.FirstOrDefault(query => query.QueryId == id);
-            var queriesUser = db.Users.FirstOrDefault(user => user.UserId == thisQuery.UserId);
-            Dictionary<string, object> model = new Dictionary<string, object> { };
-            model.Add("query", thisQuery);
-            model.Add("user", queriesUser);
-            return View(model);
+            var thisQuery = _db.Queries.Include(u => u.User).FirstOrDefault(query => query.QueryId == id);
+            return View(thisQuery);
 
         }
 
         public IActionResult Edit(int id)
         {
-            ViewBag.Users = db.Users.ToList();
-            var thisQuery = db.Queries.FirstOrDefault(query => query.QueryId == id);
+            var thisQuery = _db.Queries.Include(u => u.User).FirstOrDefault(query => query.QueryId == id);
             return View(thisQuery);
         }
         [HttpPost]
         public IActionResult Edit(Query query)
         {
-            db.Entry(query).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
-            db.SaveChanges();
+            _db.Entry(query).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
+            _db.SaveChanges();
             return RedirectToAction("Index");
         }
 
         public IActionResult Delete(int id)
         {
-            var thisQuery = db.Queries.FirstOrDefault(query => query.QueryId == id);
+            var thisQuery = _db.Queries.FirstOrDefault(query => query.QueryId == id);
             return View(thisQuery);
         }
         [HttpPost]
         public IActionResult Delete(Query deletedQuery)
         {
-            var thisQuery = db.Queries.FirstOrDefault(query => query.QueryId == deletedQuery.QueryId);
-            db.Queries.Remove(thisQuery);
-            db.SaveChanges();
+            var thisQuery = _db.Queries.FirstOrDefault(query => query.QueryId == deletedQuery.QueryId);
+            _db.Queries.Remove(thisQuery);
+            _db.SaveChanges();
             return RedirectToAction("Index");
         }
     }

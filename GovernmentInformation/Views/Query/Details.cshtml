@@ -1,7 +1,7 @@
 ﻿@using GovernmentInformation.Models
 
-<h3>Query: @Model["query"].Description </h3>
-<h5>User: @Model["user"].UserName</h5>
+<h3>Query: @Model.Description </h3>
 
-<p><a href="@Url.Action("Edit", new { id = Model["query"].QueryId })">Edit Query</a></p>
-<p><a href="@Url.Action("Delete", new { id = Model["query"].QueryId })">Delete this query</a></p>
+
+<p><a href="@Url.Action("Edit", new { id = Model.QueryId })">Edit Query</a></p>
+<p><a href="@Url.Action("Delete", new { id = Model.QueryId })">Delete this query</a></p>

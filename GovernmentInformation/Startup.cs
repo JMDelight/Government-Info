@@ -11,6 +11,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using GovernmentInformation.Models;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace GovernmentInformation
 {
@@ -32,11 +33,13 @@ namespace GovernmentInformation
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-      services.AddEntityFramework()
-          .AddDbContext<GovernmentInformationDbContext>(options =>
-              options.UseSqlServer(Configuration["ConnectionStrings:DefaultConnection"]));
-      // Add framework services.
-      services.AddMvc();
+            services.AddEntityFramework()
+              .AddDbContext<ApplicationDbContext>(options =>
+                  options.UseSqlServer(Configuration["ConnectionStrings:DefaultConnection"]));
+            services.AddMvc();
+            services.AddIdentity<ApplicationUser, IdentityRole>()
+                .AddEntityFrameworkStores<ApplicationDbContext>()
+                .AddDefaultTokenProviders();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -54,7 +57,7 @@ namespace GovernmentInformation
             {
                 app.UseExceptionHandler("/Home/Error");
             }
-
+            app.UseIdentity();
             app.UseStaticFiles();
 
             app.UseMvc(routes =>

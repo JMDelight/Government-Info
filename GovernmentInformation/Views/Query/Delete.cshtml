@@ -5,7 +5,7 @@
 <form method="post">
     <div class="form-group">
         <input asp-for="QueryId" type="hidden" value="@Model.QueryId" />
-        <input asp-for="UserId" type="hidden" value="@Model.UserId" />
+        <input asp-for="User" type="hidden" value="@Model.User" />
         <input asp-for="Description" type="hidden" value="@Model.Description" />
         <button class="btn-danger" onclick="alert('Query has been deleted.')">Don't do it!</button>
     </div>

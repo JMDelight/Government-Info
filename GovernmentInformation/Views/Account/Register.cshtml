@@ -1,0 +1,26 @@
+﻿@{
+    ViewData["Title"] = "Add New User";
+}
+@using GovernmentInformation.ViewModels
+@model RegisterViewModel
+<h2>Create</h2>
+<hr />
+<h4>Add a new user</h4>
+<form method="post">
+    <div class="form-group">
+        <label asp-for="Name" class="control-label"></label>
+        <input asp-for="Name" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label asp-for="Password" class="control-label"></label>
+        <input type="password" asp-for="Password" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label asp-for="ConfirmPassword" class="control-label"></label>
+        <input type="password" asp-for="ConfirmPassword" class="form-control" />
+    </div>
+    <div>
+        <button class="btn btn-lg btn-success">Save</button>
+    </div>
+</form>
+<p>@Html.ActionLink("Back to user list", "Index")</p>
