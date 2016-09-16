@@ -8,21 +8,21 @@ using GovernmentInformation.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 
 // For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace GovernmentInformation.Controllers
 {
+    [Authorize]
     public class QueryController : Controller
     {
         private readonly ApplicationDbContext _db;
         private readonly UserManager<ApplicationUser> _userManager;
-        private readonly SignInManager<ApplicationUser> _signInManager;
 
         public QueryController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, ApplicationDbContext db)
         {
             _userManager = userManager;
-            _signInManager = signInManager;
             _db = db;
         }
         public async Task<IActionResult> Index()
@@ -51,7 +51,6 @@ namespace GovernmentInformation.Controllers
         {
             var thisQuery = _db.Queries.Include(u => u.User).FirstOrDefault(query => query.QueryId == id);
             return View(thisQuery);
-
         }
 
         public IActionResult Edit(int id)

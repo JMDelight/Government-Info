@@ -13,7 +13,6 @@ namespace GovernmentInformation.Controllers
 {
     public class AccountController : Controller
     {
-        // GET: /<controller>/
         private readonly ApplicationDbContext _db;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
@@ -24,6 +23,7 @@ namespace GovernmentInformation.Controllers
             _signInManager = signInManager;
             _db = db;
         }
+
         public IActionResult Index()
         {
             return View();
@@ -52,7 +52,6 @@ namespace GovernmentInformation.Controllers
         {
             return View();
         }
-
         [HttpPost]
         public async Task<IActionResult> Login(LoginViewModel model)
         {
@@ -67,7 +66,6 @@ namespace GovernmentInformation.Controllers
             }
         }
 
-        [HttpPost]
         public async Task<IActionResult> LogOff()
         {
             await _signInManager.SignOutAsync();

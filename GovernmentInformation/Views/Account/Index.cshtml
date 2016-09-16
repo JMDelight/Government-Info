@@ -1,23 +1,19 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
-    ViewData["Title"] = "Index";
+﻿@{
+    ViewData["Title"] = "Account";
 }
 @using System.Security.Claims
 
-<h2>Authentication with Identity</h2>
+<h2>Account</h2>
 <hr />
 @if (User.Identity.IsAuthenticated)
 {
     <p>Hello @User.Identity.Name!</p>
-    @using (Html.BeginForm("LogOff", "Account"))
-    {
-        <input type="submit" class="btn btn-default" value="Log out" />
-    }
+    <p><a asp-controller="Account" asp-action="LogOff" class="btn btn-default">Log out</a></p>
 }
 else
 {
-    <p>@Html.ActionLink("Register", "Register")</p>
-    <p>@Html.ActionLink("Log in", "Login")</p>
+    <p>
+        <a asp-controller="Account" asp-action="Register">Register</a> |
+        <a asp-controller="Account" asp-action="Login">Log in</a>
+    </p>
 }
