@@ -35,21 +35,53 @@ namespace GovernmentInformation.Controllers
         {
             return View();
         }
+        public IActionResult Reroute(JObject response)
+        {
+            var abc = response["results"];
+            var xyz = abc[0];
+            ViewBag.Response = response["results"];
+            ViewBag.Item = xyz;
+            ViewBag.ABC = "Hello";
+            return RedirectToAction("Index");
+        }
 
-        public void ApiTest()
+        public static Task<IRestResponse> GetResponseContentAsync(RestClient theClient, RestRequest theRequest)
+        {
+            var tcs = new TaskCompletionSource<IRestResponse>();
+            theClient.ExecuteAsync(theRequest, response => {
+                tcs.SetResult(response);
+            });
+            return tcs.Task;
+        }
+
+        public IActionResult LocateLegislator(int zip)
         {
             var client = new RestClient("http://congress.api.sunlightfoundation.com/legislators/locate");
-            var request = new RestRequest("?zip=97229&apikey=d5977756ff384a7da59c8e860379b4bd");
-            client.ExecuteAsync(request, response =>
+            var request = new RestRequest("?apikey=d5977756ff384a7da59c8e860379b4bd&zip=" + zip);
+            var response = new RestResponse();
+            Task.Run(async () =>
             {
-                JObject jsonResponse = JsonConvert.DeserializeObject<JObject>(response.Content);
-            });
-            //Task.Run(async () =>
-            //{
-            //    response = await GetResponseContentAsync(client, request) as RestResponse;
-            //}).Wait();
-            //JObject jsonResponse = JsonConvert.DeserializeObject<JObject>(response.Content);
-            
+                response = await GetResponseContentAsync(client, request) as RestResponse;
+            }).Wait();
+            var jsonResponse = JsonConvert.DeserializeObject<JObject>(response.Content);
+            ViewBag.Response = jsonResponse["results"];
+            return View();
+        }
+        public IActionResult LegislatorDetail(string bioguide)
+        {
+            var client = new RestClient("http://congress.api.sunlightfoundation.com/legislators");
+            var request = new RestRequest("?apikey=d5977756ff384a7da59c8e860379b4bd&bioguide_id=" + bioguide);
+            var response = new RestResponse();
+            Task.Run(async () =>
+            {
+                response = await GetResponseContentAsync(client, request) as RestResponse;
+            }).Wait();
+            var jsonResponse = JsonConvert.DeserializeObject<JObject>(response.Content);
+            var result = jsonResponse["results"];
+            ViewBag.Response = result;
+            string image = "https://twitter.com/" + result[0]["twitter_id"] + "/profile_image?size=original";
+            ViewBag.Image = image;
+            return View();
         }
     }
 }
