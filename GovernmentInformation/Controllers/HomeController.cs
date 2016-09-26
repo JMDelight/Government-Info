@@ -7,6 +7,7 @@ using RestSharp;
 using RestSharp.Authenticators;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
+using GovernmentInformation.Models;
 
 namespace GovernmentInformation.Controllers
 {
@@ -57,7 +58,7 @@ namespace GovernmentInformation.Controllers
         public IActionResult LocateLegislator(int zip)
         {
             var client = new RestClient("http://congress.api.sunlightfoundation.com/legislators/locate");
-            var request = new RestRequest("?apikey=d5977756ff384a7da59c8e860379b4bd&zip=" + zip);
+            var request = new RestRequest("?apikey=" + EnvironmentVariables.CongressApiKey + "&zip=" + zip);
             var response = new RestResponse();
             Task.Run(async () =>
             {
@@ -70,7 +71,7 @@ namespace GovernmentInformation.Controllers
         public IActionResult LegislatorDetail(string bioguide)
         {
             var clientLegislator = new RestClient("http://congress.api.sunlightfoundation.com/legislators");
-            var requestLegislator = new RestRequest("?apikey=d5977756ff384a7da59c8e860379b4bd&bioguide_id=" + bioguide);
+            var requestLegislator = new RestRequest("?apikey=" + EnvironmentVariables.CongressApiKey + "&bioguide_id=" + bioguide);
             var responseLegislator = new RestResponse();
             Task.Run(async () =>
             {
@@ -83,7 +84,7 @@ namespace GovernmentInformation.Controllers
             ViewBag.Image = image;
 
             var clientCommittees = new RestClient("http://congress.api.sunlightfoundation.com/committees");
-            var requestCommittees = new RestRequest("?apikey=d5977756ff384a7da59c8e860379b4bd&per_page=all&member_ids=" + bioguide);
+            var requestCommittees = new RestRequest("?apikey=" + EnvironmentVariables.CongressApiKey + "&per_page=all&member_ids=" + bioguide);
             var responseCommittees = new RestResponse();
             Task.Run(async () =>
             {
@@ -92,6 +93,17 @@ namespace GovernmentInformation.Controllers
             var jsonResponseCommittees = JsonConvert.DeserializeObject<JObject>(responseCommittees.Content);
             var resultCommittees = jsonResponseCommittees["results"];
             ViewBag.Committees = resultCommittees;
+
+            var clientBills = new RestClient("http://congress.api.sunlightfoundation.com/bills");
+            var requestBills = new RestRequest("?apikey=" + EnvironmentVariables.CongressApiKey + "&per_page=all&sponsor_id=" + bioguide);
+            var responseBills = new RestResponse();
+            Task.Run(async () =>
+            {
+                responseBills = await GetResponseContentAsync(clientBills, requestBills) as RestResponse;
+            }).Wait();
+            var jsonResponseBills = JsonConvert.DeserializeObject<JObject>(responseBills.Content);
+            var resultBills = jsonResponseBills["results"];
+            ViewBag.Bills = resultBills;
 
             return View();
         }

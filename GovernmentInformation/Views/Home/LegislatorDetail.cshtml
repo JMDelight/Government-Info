@@ -11,4 +11,20 @@
 
     }
 </ul>
+<h3>Bills</h3>
+<ul>
+    @foreach (var bill in ViewBag.Bills)
+    {
+        @if(bill["short_title"] != null)
+        {
+        <li>@bill["short_title"]</li>
+        }
+        else
+        {
+            <li>@bill["official_title"]</li>
+
+        }
+
+    }
+</ul>
 <img class="img-thumbnail" src ="@ViewBag.Image" />
