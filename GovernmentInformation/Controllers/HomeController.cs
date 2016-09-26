@@ -69,18 +69,30 @@ namespace GovernmentInformation.Controllers
         }
         public IActionResult LegislatorDetail(string bioguide)
         {
-            var client = new RestClient("http://congress.api.sunlightfoundation.com/legislators");
-            var request = new RestRequest("?apikey=d5977756ff384a7da59c8e860379b4bd&bioguide_id=" + bioguide);
-            var response = new RestResponse();
+            var clientLegislator = new RestClient("http://congress.api.sunlightfoundation.com/legislators");
+            var requestLegislator = new RestRequest("?apikey=d5977756ff384a7da59c8e860379b4bd&bioguide_id=" + bioguide);
+            var responseLegislator = new RestResponse();
             Task.Run(async () =>
             {
-                response = await GetResponseContentAsync(client, request) as RestResponse;
+                responseLegislator = await GetResponseContentAsync(clientLegislator, requestLegislator) as RestResponse;
             }).Wait();
-            var jsonResponse = JsonConvert.DeserializeObject<JObject>(response.Content);
-            var result = jsonResponse["results"];
-            ViewBag.Response = result;
-            string image = "https://twitter.com/" + result[0]["twitter_id"] + "/profile_image?size=original";
+            var jsonResponseLegislator = JsonConvert.DeserializeObject<JObject>(responseLegislator.Content);
+            var resultLegislator = jsonResponseLegislator["results"];
+            ViewBag.Response = resultLegislator;
+            string image = "https://twitter.com/" + resultLegislator[0]["twitter_id"] + "/profile_image?size=original";
             ViewBag.Image = image;
+
+            var clientCommittees = new RestClient("http://congress.api.sunlightfoundation.com/committees");
+            var requestCommittees = new RestRequest("?apikey=d5977756ff384a7da59c8e860379b4bd&per_page=all&member_ids=" + bioguide);
+            var responseCommittees = new RestResponse();
+            Task.Run(async () =>
+            {
+                responseCommittees = await GetResponseContentAsync(clientCommittees, requestCommittees) as RestResponse;
+            }).Wait();
+            var jsonResponseCommittees = JsonConvert.DeserializeObject<JObject>(responseCommittees.Content);
+            var resultCommittees = jsonResponseCommittees["results"];
+            ViewBag.Committees = resultCommittees;
+
             return View();
         }
     }

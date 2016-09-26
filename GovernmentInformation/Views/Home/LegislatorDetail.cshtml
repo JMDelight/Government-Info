@@ -3,5 +3,12 @@
 *@
 @{
 }
-<h1>Hi there!</h1>
+<h1>Committees</h1>
+<ul>
+    @foreach (var committee in ViewBag.Committees)
+    {
+        <li>@committee["name"] - </li>
+
+    }
+</ul>
 <img class="img-thumbnail" src ="@ViewBag.Image" />
