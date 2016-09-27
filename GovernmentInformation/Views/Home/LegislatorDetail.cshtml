@@ -7,7 +7,7 @@
 <ul>
     @foreach (var committee in ViewBag.Committees)
     {
-        <li>@committee["name"] - </li>
+        <li><a class="committee-name" onclick="committeeDetail('@committee["committee_id"]')">@committee["name"]</a></li>
 
     }
 </ul>
@@ -15,14 +15,14 @@
 <ul>
     @foreach (var bill in ViewBag.Bills)
     {
-        @if(bill["short_title"] != null)
+
+        @if (bill["short_title"] != null)
         {
-        <li>@bill["short_title"]</li>
+            <li><a class="bill-name" onclick="billDetail('@bill["bill_id"]')">@bill["short_title"]</a></li>
         }
         else
         {
-            <li>@bill["official_title"]</li>
-
+            <li><a class="bill-name" onclick="billDetail('@bill["bill_id"]')">@bill["official_title"]</a></li>
         }
 
     }

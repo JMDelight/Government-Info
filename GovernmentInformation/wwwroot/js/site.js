@@ -29,3 +29,35 @@ var legislatorDetail = function (id) {
         }
     });
 }
+
+var committeeDetail = function (committeeId) {
+
+    console.log(id);
+    $.ajax({
+        url: '/Home/CommitteeDetail',
+        type: 'get',
+        data: { committeeId: committeeId },
+        dataType: 'html',
+        success: function (result) {
+            //$('span#' + id).show();
+            //$('span#' + id).html(result);
+            console.log(result);
+        }
+    });
+}
+
+var billDetail = function (billId) {
+
+    console.log(id);
+    $.ajax({
+        url: '/Home/BillDetail',
+        type: 'get',
+        data: { billId: billId },
+        dataType: 'html',
+        success: function (result) {
+            //$('span#' + id).show();
+            //$('span#' + id).html(result);
+            console.log(result);
+        }
+    });
+}
