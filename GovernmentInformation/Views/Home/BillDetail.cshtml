@@ -5,3 +5,9 @@
 }
 
 <h3>Official Title: <a href="@ViewBag.SelectedBill["last_version"]["urls"]["pdf"]">@ViewBag.SelectedBill["official_title"]</a></h3>
+
+<button onclick="$('#bill-text').toggle()">Reveal Bill Text</button>
+
+<p id="bill-text">
+    @ViewBag.BillText
+</p>

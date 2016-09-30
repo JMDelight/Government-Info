@@ -13,7 +13,7 @@
             }
         });
     });
-})
+});
 
 var legislatorDetail = function (id) {
     $('span').hide();
@@ -28,7 +28,7 @@ var legislatorDetail = function (id) {
             $('span#' + id).html(result);
         }
     });
-}
+};
 
 var committeeDetail = function (committeeId) {
 
@@ -44,7 +44,7 @@ var committeeDetail = function (committeeId) {
             console.log(result);
         }
     });
-}
+};
 
 var billDetail = function (billId) {
 
@@ -61,4 +61,4 @@ var billDetail = function (billId) {
             console.log(result);
         }
     });
-}
+};

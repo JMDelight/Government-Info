@@ -8,6 +8,7 @@ using RestSharp.Authenticators;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
 using GovernmentInformation.Models;
+using System.Text.RegularExpressions;
 
 namespace GovernmentInformation.Controllers
 {
@@ -110,34 +111,6 @@ namespace GovernmentInformation.Controllers
 
         public IActionResult BillDetail(string billId)
         {
-
-            //Rework to use data and return only needed api call
-
-
-            //var clientLegislator = new RestClient("http://congress.api.sunlightfoundation.com/legislators");
-            //var requestLegislator = new RestRequest("?apikey=" + EnvironmentVariables.CongressApiKey + "&bioguide_id=" + bioguide);
-            //var responseLegislator = new RestResponse();
-            //Task.Run(async () =>
-            //{
-            //    responseLegislator = await GetResponseContentAsync(clientLegislator, requestLegislator) as RestResponse;
-            //}).Wait();
-            //var jsonResponseLegislator = JsonConvert.DeserializeObject<JObject>(responseLegislator.Content);
-            //var resultLegislator = jsonResponseLegislator["results"];
-            //ViewBag.Response = resultLegislator;
-            //string image = "https://twitter.com/" + resultLegislator[0]["twitter_id"] + "/profile_image?size=original";
-            //ViewBag.Image = image;
-
-            //var clientCommittees = new RestClient("http://congress.api.sunlightfoundation.com/committees");
-            //var requestCommittees = new RestRequest("?apikey=" + EnvironmentVariables.CongressApiKey + "&per_page=all&member_ids=" + bioguide);
-            //var responseCommittees = new RestResponse();
-            //Task.Run(async () =>
-            //{
-            //    responseCommittees = await GetResponseContentAsync(clientCommittees, requestCommittees) as RestResponse;
-            //}).Wait();
-            //var jsonResponseCommittees = JsonConvert.DeserializeObject<JObject>(responseCommittees.Content);
-            //var resultCommittees = jsonResponseCommittees["results"];
-            //ViewBag.Committees = resultCommittees;
-
             var clientBills = new RestClient("http://congress.api.sunlightfoundation.com/bills/search");
             var requestBills = new RestRequest("?apikey=" + EnvironmentVariables.CongressApiKey + "&bill_id=" + billId);
             var responseBills = new RestResponse();
@@ -147,9 +120,19 @@ namespace GovernmentInformation.Controllers
             }).Wait();
             var jsonResponseBills = JsonConvert.DeserializeObject<JObject>(responseBills.Content);
             var resultBills = jsonResponseBills["results"];
-            var abc = resultBills[0]["official_title"];
             ViewBag.SelectedBill = resultBills[0];
 
+            var clientBillText = new RestClient("http://www.gpo.gov/fdsys/pkg/");
+            var requestBillText = new RestRequest("BILLS-113hr4463ih/html/BILLS-113hr4463ih.htm");
+            var responseBillText = new RestResponse();
+            Task.Run(async () =>
+            {
+                responseBillText = await GetResponseContentAsync(clientBillText, requestBillText) as RestResponse;
+            }).Wait();
+            var billText = responseBillText.Content.ToString();
+            Regex regex = new Regex(@"<\S*>");
+            string processedBillText = Regex.Replace(billText, @"<\S*>", "");
+            ViewBag.BillText = processedBillText;
             return View();
         }
 
