@@ -32,7 +32,7 @@ var legislatorDetail = function (id) {
 
 var committeeDetail = function (committeeId) {
 
-    console.log(id);
+    console.log(committeeId);
     $.ajax({
         url: '/Home/CommitteeDetail',
         type: 'get',
@@ -48,7 +48,7 @@ var committeeDetail = function (committeeId) {
 
 var billDetail = function (billId) {
 
-    console.log(id);
+    console.log(billId);
     $.ajax({
         url: '/Home/BillDetail',
         type: 'get',
@@ -57,6 +57,7 @@ var billDetail = function (billId) {
         success: function (result) {
             //$('span#' + id).show();
             //$('span#' + id).html(result);
+            $('#result2').html(result);
             console.log(result);
         }
     });

@@ -108,7 +108,7 @@ namespace GovernmentInformation.Controllers
             return View();
         }
 
-        public IActionResult BillDetail(string bioguide)
+        public IActionResult BillDetail(string billId)
         {
 
             //Rework to use data and return only needed api call
@@ -138,16 +138,17 @@ namespace GovernmentInformation.Controllers
             //var resultCommittees = jsonResponseCommittees["results"];
             //ViewBag.Committees = resultCommittees;
 
-            //var clientBills = new RestClient("http://congress.api.sunlightfoundation.com/bills");
-            //var requestBills = new RestRequest("?apikey=" + EnvironmentVariables.CongressApiKey + "&per_page=all&sponsor_id=" + bioguide);
-            //var responseBills = new RestResponse();
-            //Task.Run(async () =>
-            //{
-            //    responseBills = await GetResponseContentAsync(clientBills, requestBills) as RestResponse;
-            //}).Wait();
-            //var jsonResponseBills = JsonConvert.DeserializeObject<JObject>(responseBills.Content);
-            //var resultBills = jsonResponseBills["results"];
-            //ViewBag.Bills = resultBills;
+            var clientBills = new RestClient("http://congress.api.sunlightfoundation.com/bills/search");
+            var requestBills = new RestRequest("?apikey=" + EnvironmentVariables.CongressApiKey + "&bill_id=" + billId);
+            var responseBills = new RestResponse();
+            Task.Run(async () =>
+            {
+                responseBills = await GetResponseContentAsync(clientBills, requestBills) as RestResponse;
+            }).Wait();
+            var jsonResponseBills = JsonConvert.DeserializeObject<JObject>(responseBills.Content);
+            var resultBills = jsonResponseBills["results"];
+            var abc = resultBills[0]["official_title"];
+            ViewBag.SelectedBill = resultBills[0];
 
             return View();
         }
@@ -181,8 +182,8 @@ namespace GovernmentInformation.Controllers
             //var resultCommittees = jsonResponseCommittees["results"];
             //ViewBag.Committees = resultCommittees;
 
-            //var clientBills = new RestClient("http://congress.api.sunlightfoundation.com/bills");
-            //var requestBills = new RestRequest("?apikey=" + EnvironmentVariables.CongressApiKey + "&per_page=all&sponsor_id=" + bioguide);
+            //var clientBills = new RestClient("http://congress.api.sunlightfoundation.com/bills/search");
+            
             //var responseBills = new RestResponse();
             //Task.Run(async () =>
             //{
