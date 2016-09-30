@@ -31,7 +31,6 @@ var legislatorDetail = function (id) {
 };
 
 var committeeDetail = function (committeeId) {
-
     console.log(committeeId);
     $.ajax({
         url: '/Home/CommitteeDetail',
@@ -46,7 +45,6 @@ var committeeDetail = function (committeeId) {
 };
 
 var billDetail = function (billId) {
-
     console.log(billId);
     $.ajax({
         url: '/Home/BillDetail',

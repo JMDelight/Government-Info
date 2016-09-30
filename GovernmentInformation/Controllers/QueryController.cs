@@ -31,7 +31,6 @@ namespace GovernmentInformation.Controllers
             var currentUser = await _userManager.FindByIdAsync(userId);
             return View(_db.Queries.Where(queries => queries.User.Id == currentUser.Id).ToList());           
         }
-
         public IActionResult Create()
         {
             return View();
@@ -46,13 +45,11 @@ namespace GovernmentInformation.Controllers
             _db.SaveChanges();
             return RedirectToAction("Index");
         }
-
         public IActionResult Details(int id)
         {
             var thisQuery = _db.Queries.Include(u => u.User).FirstOrDefault(query => query.QueryId == id);
             return View(thisQuery);
         }
-
         public IActionResult Edit(int id)
         {
             var thisQuery = _db.Queries.Include(u => u.User).FirstOrDefault(query => query.QueryId == id);
@@ -65,7 +62,6 @@ namespace GovernmentInformation.Controllers
             _db.SaveChanges();
             return RedirectToAction("Index");
         }
-
         public IActionResult Delete(int id)
         {
             var thisQuery = _db.Queries.FirstOrDefault(query => query.QueryId == id);

@@ -14,31 +14,6 @@ namespace GovernmentInformation.Controllers
 {
     public class HomeController : Controller
     {
-        public IActionResult Index()
-        {
-            return View();
-        }
-
-        public IActionResult About()
-        {
-            ViewData["Message"] = "Your application description page.";
-
-            return View();
-        }
-
-        public IActionResult Contact()
-        {
-            ViewData["Message"] = "Your contact page.";
-
-            return View();
-        }
-
-        public IActionResult Error()
-        {
-            return View();
-        }
-
-
         public static Task<IRestResponse> GetResponseContentAsync(RestClient theClient, RestRequest theRequest)
         {
             var tcs = new TaskCompletionSource<IRestResponse>();
@@ -48,6 +23,25 @@ namespace GovernmentInformation.Controllers
             return tcs.Task;
         }
 
+        public IActionResult Index()
+        {
+            return View();
+        }
+        public IActionResult About()
+        {
+            ViewData["Message"] = "Your application description page.";
+
+            return View();
+        }
+        public IActionResult Contact()
+        {
+            ViewData["Message"] = "Your contact page.";
+            return View();
+        }
+        public IActionResult Error()
+        {
+            return View();
+        }
         public IActionResult LocateLegislator(int zip)
         {
             var client = new RestClient("http://congress.api.sunlightfoundation.com/legislators/locate");
@@ -123,7 +117,6 @@ namespace GovernmentInformation.Controllers
                 responseBillText = await GetResponseContentAsync(clientBillText, requestBillText) as RestResponse;
             }).Wait();
             var billText = responseBillText.Content.ToString();
-            //Regex regex = new Regex(@"<\S*>");
             string processedBillText = Regex.Replace(billText, @"<\S*>", "");
             ViewBag.BillText = processedBillText;
             return View();
@@ -131,8 +124,6 @@ namespace GovernmentInformation.Controllers
 
         public IActionResult CommitteeDetail(string committeeId)
         {
-            //Rework to use data and return only needed api call
-
             var clientCommittees = new RestClient("http://congress.api.sunlightfoundation.com/committees");
             var requestCommittees = new RestRequest("?apikey=" + EnvironmentVariables.CongressApiKey + "&committee_id=" + committeeId);
             var responseCommittees = new RestResponse();
@@ -143,21 +134,34 @@ namespace GovernmentInformation.Controllers
             var jsonResponseCommittees = JsonConvert.DeserializeObject<JObject>(responseCommittees.Content);
             var resultCommittee = jsonResponseCommittees["results"][0];
             ViewBag.Committee = resultCommittee;
-
-            if (!(bool)resultCommittee["subcommittee"])
+            bool isSubCommittee = (bool)resultCommittee["subcommittee"];
+            ViewBag.IsSubCommittee = isSubCommittee;
+            if (!isSubCommittee)
             {
                 var clientSubCommittees = new RestClient("http://congress.api.sunlightfoundation.com/committees");
                 var requestSubCommittees = new RestRequest("?apikey=" + EnvironmentVariables.CongressApiKey + "&parent_committee_id=" + committeeId);
                 var responseSubCommittees = new RestResponse();
                 Task.Run(async () =>
                 {
-                    responseCommittees = await GetResponseContentAsync(clientSubCommittees, requestSubCommittees) as RestResponse;
+                    responseSubCommittees = await GetResponseContentAsync(clientSubCommittees, requestSubCommittees) as RestResponse;
                 }).Wait();
-                var jsonResponseSubCommittees = JsonConvert.DeserializeObject<JObject>(responseCommittees.Content);
-                var resultCommittees = jsonResponseCommittees["results"];
+                var jsonResponseSubCommittees = JsonConvert.DeserializeObject<JObject>(responseSubCommittees.Content);
+                var resultCommittees = jsonResponseSubCommittees["results"];
                 ViewBag.SubCommittees = resultCommittees;
             }
-
+            else
+            {
+                var clientParentCommittee = new RestClient("http://congress.api.sunlightfoundation.com/committees");
+                var requestParentCommittee = new RestRequest("?apikey=" + EnvironmentVariables.CongressApiKey + "&committee_id=" + resultCommittee["parent_committee_id"]);
+                var responseParentCommittee = new RestResponse();
+                Task.Run(async () =>
+                {
+                    responseParentCommittee = await GetResponseContentAsync(clientParentCommittee, requestParentCommittee) as RestResponse;
+                }).Wait();
+                var jsonResponseParentCommittee = JsonConvert.DeserializeObject<JObject>(responseParentCommittee.Content);
+                var resultCommittees = jsonResponseParentCommittee["results"][0];
+                ViewBag.ParentCommittee = resultCommittees;
+            }
 
             return View();
         }

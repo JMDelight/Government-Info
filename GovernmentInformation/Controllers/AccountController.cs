@@ -65,7 +65,6 @@ namespace GovernmentInformation.Controllers
                 return View();
             }
         }
-
         public async Task<IActionResult> LogOff()
         {
             await _signInManager.SignOutAsync();

@@ -8,7 +8,6 @@
     @foreach (var committee in ViewBag.Committees)
     {
         <li><a class="committee-name" onclick="committeeDetail('@committee["committee_id"]')">@committee["name"]</a></li>
-
     }
 </ul>
 <h3>Bills</h3>
@@ -24,7 +23,6 @@
         {
             <li><a class="bill-name" onclick="billDetail('@bill["bill_id"]')">@bill["official_title"]</a></li>
         }
-
     }
 </ul>
 <img class="img-thumbnail" src ="@ViewBag.Image" />

@@ -1,19 +1,15 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
-}
-<h4>@ViewBag.Committee["name"]</h4>
-
-@if(ViewBag.SubCommittees != null)
+﻿<h4>@ViewBag.Committee["name"]</h4>
+@if(!ViewBag.IsSubCommittee)
 {
-    @foreach(var committee in ViewBag.SubCommittees)
-    {
-        <h4>@committee["name"]</h4>
-
-    }
+    <h5>Subcommittees</h5>
+    <ul>
+        @foreach(var committee in ViewBag.SubCommittees)
+        {
+            <li>@committee["name"]</li>
+        }
+    </ul>
 }
 else
 {
-    <h4>This is a subcommittee</h4>
+    <h4>This is a subcommittee, the parent committee is @ViewBag.ParentCommittee["name"]</h4>
 }
