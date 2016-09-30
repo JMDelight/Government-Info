@@ -37,15 +37,7 @@ namespace GovernmentInformation.Controllers
         {
             return View();
         }
-        public IActionResult Reroute(JObject response)
-        {
-            var abc = response["results"];
-            var xyz = abc[0];
-            ViewBag.Response = response["results"];
-            ViewBag.Item = xyz;
-            ViewBag.ABC = "Hello";
-            return RedirectToAction("Index");
-        }
+
 
         public static Task<IRestResponse> GetResponseContentAsync(RestClient theClient, RestRequest theRequest)
         {
@@ -120,23 +112,24 @@ namespace GovernmentInformation.Controllers
             }).Wait();
             var jsonResponseBills = JsonConvert.DeserializeObject<JObject>(responseBills.Content);
             var resultBills = jsonResponseBills["results"];
+            string billUrl = (string) resultBills[0]["last_version"]["urls"]["html"];
             ViewBag.SelectedBill = resultBills[0];
 
-            var clientBillText = new RestClient("http://www.gpo.gov/fdsys/pkg/");
-            var requestBillText = new RestRequest("BILLS-113hr4463ih/html/BILLS-113hr4463ih.htm");
+            var clientBillText = new RestClient(billUrl);
+            var requestBillText = new RestRequest();
             var responseBillText = new RestResponse();
             Task.Run(async () =>
             {
                 responseBillText = await GetResponseContentAsync(clientBillText, requestBillText) as RestResponse;
             }).Wait();
             var billText = responseBillText.Content.ToString();
-            Regex regex = new Regex(@"<\S*>");
+            //Regex regex = new Regex(@"<\S*>");
             string processedBillText = Regex.Replace(billText, @"<\S*>", "");
             ViewBag.BillText = processedBillText;
             return View();
         }
 
-        public IActionResult CommitteeDetail(string bioguide)
+        public IActionResult CommitteeDetail(string committeeId)
         {
             //Rework to use data and return only needed api call
 

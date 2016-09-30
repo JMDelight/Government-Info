@@ -12,6 +12,9 @@ _This is a C# web application that is designed to allow a user to easily navigat
 
 * _Download the repository_
 * _Open the project in Visual Studios_
+* _In the NuGet Package Manager Settings, add the following package source:_
+  * _Name: dotnet-core_
+  * _Source:_ https://dotnet.myget.org/F/dotnet-core/api/v3/index.json
 * _Build the project(ctrl + shift + B)_
 * _In the command line, navigate to the GovernmentInformation folder in the repository_
 * _Run the command dotnet ef database update_
@@ -28,7 +31,7 @@ _If you have any questions or concerns, please email me at thefencingflutist@gma
 
 ## Technologies Used
 
-_Visual Studios 2015, C#, Asp.Net Core, Entity Framework, Razor, mssql, bootstrap_
+_Visual Studios 2015, C#, Asp.Net Core, Entity Framework, Razor, mssql, bootstrap, Sunlight Foundation Congress API, NuGet, Json.NET, RestSharp_
 
 ### License
 
