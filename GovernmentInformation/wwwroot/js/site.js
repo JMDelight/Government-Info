@@ -39,8 +39,7 @@ var committeeDetail = function (committeeId) {
         data: { committeeId: committeeId },
         dataType: 'html',
         success: function (result) {
-            //$('span#' + id).show();
-            //$('span#' + id).html(result);
+            $('#result2').html(result);
             console.log(result);
         }
     });
@@ -55,8 +54,6 @@ var billDetail = function (billId) {
         data: { billId: billId },
         dataType: 'html',
         success: function (result) {
-            //$('span#' + id).show();
-            //$('span#' + id).html(result);
             $('#result2').html(result);
             console.log(result);
         }
