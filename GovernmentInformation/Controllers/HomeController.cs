@@ -163,6 +163,17 @@ namespace GovernmentInformation.Controllers
                 ViewBag.ParentCommittee = resultCommittees;
             }
 
+            var clientCommitteeMembers = new RestClient("http://congress.api.sunlightfoundation.com/committees");
+            var requestCommitteeMembers = new RestRequest("?apikey=" + EnvironmentVariables.CongressApiKey + "&fields=members&committee_id=" + committeeId);
+            var responseCommitteeMembers = new RestResponse();
+            Task.Run(async () =>
+            {
+                responseCommitteeMembers = await GetResponseContentAsync(clientCommitteeMembers, requestCommitteeMembers) as RestResponse;
+            }).Wait();
+            var jsonResponseCommitteeMembers = JsonConvert.DeserializeObject<JObject>(responseCommitteeMembers.Content);
+            var resultCommitteeMembers = jsonResponseCommitteeMembers["results"][0]["members"];
+            ViewBag.CommitteeMembers = resultCommitteeMembers;
+
             return View();
         }
     }

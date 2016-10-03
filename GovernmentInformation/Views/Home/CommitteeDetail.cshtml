@@ -1,9 +1,17 @@
 ﻿<h4>@ViewBag.Committee["name"]</h4>
-@if(!ViewBag.IsSubCommittee)
+<h5>Committee Members:</h5>
+<ul>
+    @foreach(var member in ViewBag.CommitteeMembers)
+    {
+        <li>@member["title"] @member["legislator"]["first_name"] @member["legislator"]["last_name"]</li>
+
+    }
+</ul>
+@if (!ViewBag.IsSubCommittee)
 {
     <h5>Subcommittees</h5>
     <ul>
-        @foreach(var committee in ViewBag.SubCommittees)
+        @foreach (var committee in ViewBag.SubCommittees)
         {
             <li>@committee["name"]</li>
         }
