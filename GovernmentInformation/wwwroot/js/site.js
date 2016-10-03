@@ -1,4 +1,6 @@
-﻿$(document).ready(function () {
+﻿var columnNumber = 0;
+
+$(document).ready(function () {
     $('body').on("submit", ".legislator-zip", function (event) {
         event.preventDefault();
         console.log("Hello");
@@ -9,23 +11,29 @@
             dataType: 'html',
             success: function (result) {
                 console.log('Hello');
-                $('#result1').html(result);
+                $('#lookup').html(result);
             }
         });
     });
 });
 
 var legislatorDetail = function (id) {
-    $('span').hide();
+    //$('span').hide();
     console.log(id);
     $.ajax({
         url: '/Home/LegislatorDetail',
         type: 'get',
-        data: { bioguide: id },
+        data: { columnId: columnNumber, bioguide: id },
         dataType: 'html',
         success: function (result) {
-            $('span#' + id).show();
-            $('span#' + id).html(result);
+            if (columnNumber >= 3) {
+                $('#result' + (columnNumber - 3)).hide();
+                $('#result-container').append('<div class="col-sm-4" id="result' + columnNumber + '"></div>');
+            }
+            $('#result' + columnNumber).html(result);
+            columnNumber ++;
+            //$('span#' + id).show();
+            //$('span#' + id).html(result);
         }
     });
 };
@@ -35,11 +43,15 @@ var committeeDetail = function (committeeId) {
     $.ajax({
         url: '/Home/CommitteeDetail',
         type: 'get',
-        data: { committeeId: committeeId },
+        data: { columnId: columnNumber, committeeId: committeeId },
         dataType: 'html',
         success: function (result) {
-            $('#result2').html(result);
-            console.log(result);
+            if (columnNumber >= 3) {
+                $('#result' + (columnNumber - 3)).hide();
+                $('#result-container').append('<div class="col-sm-4" id="result' + columnNumber + '"></div>');
+            }
+            $('#result' + columnNumber).html(result);
+            columnNumber ++;
         }
     });
 };
@@ -49,11 +61,32 @@ var billDetail = function (billId) {
     $.ajax({
         url: '/Home/BillDetail',
         type: 'get',
-        data: { billId: billId },
+        data: { columnId: columnNumber, billId: billId },
         dataType: 'html',
         success: function (result) {
-            $('#result2').html(result);
-            console.log(result);
+            if (columnNumber >= 3) {
+                $('#result' + (columnNumber - 3)).hide();
+                $('#result-container').append('<div class="col-sm-4" id="result' + columnNumber + '"></div>');
+            }
+            $('#result' + columnNumber).html(result);
+            columnNumber ++;
+        }
+    });
+};
+
+var committeeLegislatorDetail = function (id) {
+    $.ajax({
+        url: '/Home/LegislatorDetail',
+        type: 'get',
+        data: { columnId: columnNumber, bioguide: id },
+        dataType: 'html',
+        success: function (result) {
+            if (columnNumber >= 3) {
+                $('#result' + (columnNumber - 3)).hide();
+                $('#result-container').append('<div class="col-sm-4" id="result' + columnNumber + '"></div>');
+            }
+            $('#result' + columnNumber).html(result);
+            columnNumber ++;
         }
     });
 };

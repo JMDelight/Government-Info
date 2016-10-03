@@ -3,21 +3,22 @@
 <ul>
     @foreach(var member in ViewBag.CommitteeMembers)
     {
-        <li>@member["title"] @member["legislator"]["first_name"] @member["legislator"]["last_name"]</li>
+        <li>@member["title"] <a class="bill-name" onclick="committeeLegislatorDetail('@member["legislator"]["bioguide_id"]')">@member["legislator"]["first_name"] @member["legislator"]["last_name"] </a></li>
 
     }
 </ul>
-@if (!ViewBag.IsSubCommittee)
+@if (ViewBag.IsSubCommittee)
 {
     <h5>Subcommittees</h5>
+    <h4>This is a subcommittee, the parent committee is @ViewBag.ParentCommittee["name"]</h4>
+}
+else
+{
     <ul>
+
         @foreach (var committee in ViewBag.SubCommittees)
         {
             <li>@committee["name"]</li>
         }
     </ul>
-}
-else
-{
-    <h4>This is a subcommittee, the parent committee is @ViewBag.ParentCommittee["name"]</h4>
 }

@@ -1,8 +1,13 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
+﻿@{
 }
+@foreach(var call in ViewBag.Calls)
+{
+    <h6>__ @call.CallType</h6>
+
+}
+
+<h4>@ViewBag.Legislator["first_name"] @ViewBag.Legislator["last_name"]</h4>
+<img class="img-thumbnail" src="@ViewBag.Image" />
 <h1>Committees</h1>
 <ul>
     @foreach (var committee in ViewBag.Committees)
@@ -25,4 +30,3 @@
         }
     }
 </ul>
-<img class="img-thumbnail" src ="@ViewBag.Image" />

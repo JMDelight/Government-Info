@@ -9,11 +9,13 @@ using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
 using GovernmentInformation.Models;
 using System.Text.RegularExpressions;
+using GovernmentInformation.ViewModels;
 
 namespace GovernmentInformation.Controllers
 {
     public class HomeController : Controller
     {
+        public static List<ApiCall> apiCalls = new List<ApiCall> {};
         public static Task<IRestResponse> GetResponseContentAsync(RestClient theClient, RestRequest theRequest)
         {
             var tcs = new TaskCompletionSource<IRestResponse>();
@@ -55,8 +57,14 @@ namespace GovernmentInformation.Controllers
             ViewBag.Response = jsonResponse["results"];
             return View();
         }
-        public IActionResult LegislatorDetail(string bioguide)
+        public IActionResult LegislatorDetail(int columnId, string bioguide)
         {
+            var abc = apiCalls;
+            ApiCall newCall = new ApiCall(columnId, "Legislator", bioguideId: bioguide);
+            var aab = apiCalls;
+            apiCalls.Add(newCall);
+            ViewBag.Calls = apiCalls;
+
             var clientLegislator = new RestClient("http://congress.api.sunlightfoundation.com/legislators");
             var requestLegislator = new RestRequest("?apikey=" + EnvironmentVariables.CongressApiKey + "&bioguide_id=" + bioguide);
             var responseLegislator = new RestResponse();
@@ -66,7 +74,7 @@ namespace GovernmentInformation.Controllers
             }).Wait();
             var jsonResponseLegislator = JsonConvert.DeserializeObject<JObject>(responseLegislator.Content);
             var resultLegislator = jsonResponseLegislator["results"];
-            ViewBag.Response = resultLegislator;
+            ViewBag.Legislator = resultLegislator[0];
             string image = "https://twitter.com/" + resultLegislator[0]["twitter_id"] + "/profile_image?size=original";
             ViewBag.Image = image;
 
@@ -95,8 +103,12 @@ namespace GovernmentInformation.Controllers
             return View();
         }
 
-        public IActionResult BillDetail(string billId)
+        public IActionResult BillDetail(int columnId, string billId)
         {
+            ApiCall newCall = new ApiCall(columnId, "Bill", bioguideId: billId);
+            apiCalls.Add(newCall);
+            ViewBag.Calls = apiCalls;
+
             var clientBills = new RestClient("http://congress.api.sunlightfoundation.com/bills/search");
             var requestBills = new RestRequest("?apikey=" + EnvironmentVariables.CongressApiKey + "&bill_id=" + billId);
             var responseBills = new RestResponse();
@@ -122,8 +134,11 @@ namespace GovernmentInformation.Controllers
             return View();
         }
 
-        public IActionResult CommitteeDetail(string committeeId)
+        public IActionResult CommitteeDetail(int columnId, string committeeId)
         {
+            ApiCall newCall = new ApiCall(columnId, "Committee", bioguideId: committeeId);
+            apiCalls.Add(newCall);
+            ViewBag.Calls = apiCalls;
             var clientCommittees = new RestClient("http://congress.api.sunlightfoundation.com/committees");
             var requestCommittees = new RestRequest("?apikey=" + EnvironmentVariables.CongressApiKey + "&committee_id=" + committeeId);
             var responseCommittees = new RestResponse();
