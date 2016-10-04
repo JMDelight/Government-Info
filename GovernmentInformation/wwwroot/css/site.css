@@ -42,3 +42,6 @@ textarea {
     width: 80px;
     height: auto;
 }
+.deleted {
+    text-decoration: line-through;
+}

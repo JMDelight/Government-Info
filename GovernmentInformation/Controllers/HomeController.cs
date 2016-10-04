@@ -120,22 +120,49 @@ namespace GovernmentInformation.Controllers
 
         public IActionResult BillDetail(int columnId, string billId)
         {
-            ViewBag.ThisColumn = columnId;
 
-            var clientBills = new RestClient("http://congress.api.sunlightfoundation.com/bills/search");
-            var requestBills = new RestRequest("?apikey=" + EnvironmentVariables.CongressApiKey + "&bill_id=" + billId);
-            var responseBills = new RestResponse();
-            Task.Run(async () =>
+            int index = Bill.retrievedBills.FindIndex(bill => bill.BillId == billId);
+            JToken resultBill;
+            string finishedBillText;
+            string billTitle;
+
+            if (index >= 0)
             {
-                responseBills = await GetResponseContentAsync(clientBills, requestBills) as RestResponse;
-            }).Wait();
-            var jsonResponseBills = JsonConvert.DeserializeObject<JObject>(responseBills.Content);
-            var resultBill = jsonResponseBills["results"][0];
-            string billUrl = (string) resultBill["last_version"]["urls"]["html"];
-            ViewBag.SelectedBill = resultBill;
+                resultBill = Bill.retrievedBills[index].JsonResponse;
+                finishedBillText = Bill.retrievedBills[index].BillText;
+            }
+            else
+            {
+                var clientBills = new RestClient("http://congress.api.sunlightfoundation.com/bills/search");
+                var requestBills = new RestRequest("?apikey=" + EnvironmentVariables.CongressApiKey + "&bill_id=" + billId);
+                var responseBills = new RestResponse();
+                Task.Run(async () =>
+                {
+                    responseBills = await GetResponseContentAsync(clientBills, requestBills) as RestResponse;
+                }).Wait();
+                var jsonResponseBills = JsonConvert.DeserializeObject<JObject>(responseBills.Content);
+                resultBill = jsonResponseBills["results"][0];
+
+                string billUrl = (string) resultBill["last_version"]["urls"]["html"];
+                var clientBillText = new RestClient(billUrl);
+                var requestBillText = new RestRequest();
+                var responseBillText = new RestResponse();
+                Task.Run(async () =>
+                {
+                    responseBillText = await GetResponseContentAsync(clientBillText, requestBillText) as RestResponse;
+                }).Wait();
+                var billText = responseBillText.Content.ToString();
+                string processedBillText = Regex.Replace(billText, @"<\S*>", "");
+                string formattedBillText = Regex.Replace(processedBillText, @"_{71}", "</p><hr /><p>");
+                finishedBillText = formattedBillText.Replace("&lt;DELETED&gt;", "<span class='deleted'>").Replace("&lt;/DELETED&gt;", "</span>");
+
+                Bill foundBill = new Bill(billId, resultBill, finishedBillText);
+                Bill.retrievedBills.Add(foundBill);
+            }
+
+
 
             string shortTitle = (string)resultBill["short_title"];
-            string billTitle = "";
             if(shortTitle != null)
             {
                 billTitle = (string) resultBill["short_title"];
@@ -144,22 +171,20 @@ namespace GovernmentInformation.Controllers
             {
                 billTitle = (string)resultBill["official_title"];
             }
-            ApiCall newCall = new ApiCall(columnId, "Bill", billTitle, bioguideId: billId);
-            apiCalls.Add(newCall);
-            ViewBag.Calls = apiCalls;
 
-            var clientBillText = new RestClient(billUrl);
-            var requestBillText = new RestRequest();
-            var responseBillText = new RestResponse();
-            Task.Run(async () =>
+            if (index < 0)
             {
-                responseBillText = await GetResponseContentAsync(clientBillText, requestBillText) as RestResponse;
-            }).Wait();
-            var billText = responseBillText.Content.ToString();
-            string processedBillText = Regex.Replace(billText, @"<\S*>", "");
-            ViewBag.BillText = processedBillText;
+                ApiCall newCall = new ApiCall(columnId, "Bill", billTitle, bioguideId: billId);
+                apiCalls.Add(newCall);
+            }
+
+            ViewBag.Calls = apiCalls;
+            ViewBag.SelectedBill = resultBill;
+            ViewBag.BillText = finishedBillText;
+            ViewBag.ThisColumn = columnId;
             return View();
         }
+
 
         public IActionResult CommitteeDetail(int columnId, string committeeId)
         {

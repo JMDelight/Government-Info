@@ -3,6 +3,6 @@
 <div class="@string.Concat("Bill", ViewBag.ThisColumn)">
     <button onclick="$('.@string.Concat("Bill", ViewBag.ThisColumn) p').toggle()">Reveal Bill Text</button>
     <p class="bill-text" style="display: none;">
-        @ViewBag.BillText
+        @Html.Raw(ViewBag.BillText)
     </p>
 </div>
