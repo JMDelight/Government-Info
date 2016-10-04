@@ -59,12 +59,6 @@ namespace GovernmentInformation.Controllers
         }
         public IActionResult LegislatorDetail(int columnId, string bioguide)
         {
-            var abc = apiCalls;
-            ApiCall newCall = new ApiCall(columnId, "Legislator", bioguideId: bioguide);
-            var aab = apiCalls;
-            apiCalls.Add(newCall);
-            ViewBag.Calls = apiCalls;
-
             var clientLegislator = new RestClient("http://congress.api.sunlightfoundation.com/legislators");
             var requestLegislator = new RestRequest("?apikey=" + EnvironmentVariables.CongressApiKey + "&bioguide_id=" + bioguide);
             var responseLegislator = new RestResponse();
@@ -73,10 +67,15 @@ namespace GovernmentInformation.Controllers
                 responseLegislator = await GetResponseContentAsync(clientLegislator, requestLegislator) as RestResponse;
             }).Wait();
             var jsonResponseLegislator = JsonConvert.DeserializeObject<JObject>(responseLegislator.Content);
-            var resultLegislator = jsonResponseLegislator["results"];
-            ViewBag.Legislator = resultLegislator[0];
-            string image = "https://twitter.com/" + resultLegislator[0]["twitter_id"] + "/profile_image?size=original";
+            var resultLegislator = jsonResponseLegislator["results"][0];
+            ViewBag.Legislator = resultLegislator;
+            string image = "https://twitter.com/" + resultLegislator["twitter_id"] + "/profile_image?size=original";
             ViewBag.Image = image;
+
+            string legislatorName = (string) resultLegislator["first_name"] + " " + (string) resultLegislator["last_name"];
+            ApiCall newCall = new ApiCall(columnId, "Legislator", legislatorName, bioguideId: bioguide);
+            apiCalls.Add(newCall);
+            ViewBag.Calls = apiCalls;
 
             var clientCommittees = new RestClient("http://congress.api.sunlightfoundation.com/committees");
             var requestCommittees = new RestRequest("?apikey=" + EnvironmentVariables.CongressApiKey + "&per_page=all&member_ids=" + bioguide);
@@ -105,9 +104,7 @@ namespace GovernmentInformation.Controllers
 
         public IActionResult BillDetail(int columnId, string billId)
         {
-            ApiCall newCall = new ApiCall(columnId, "Bill", bioguideId: billId);
-            apiCalls.Add(newCall);
-            ViewBag.Calls = apiCalls;
+            ViewBag.ThisColumn = columnId;
 
             var clientBills = new RestClient("http://congress.api.sunlightfoundation.com/bills/search");
             var requestBills = new RestRequest("?apikey=" + EnvironmentVariables.CongressApiKey + "&bill_id=" + billId);
@@ -117,9 +114,23 @@ namespace GovernmentInformation.Controllers
                 responseBills = await GetResponseContentAsync(clientBills, requestBills) as RestResponse;
             }).Wait();
             var jsonResponseBills = JsonConvert.DeserializeObject<JObject>(responseBills.Content);
-            var resultBills = jsonResponseBills["results"];
-            string billUrl = (string) resultBills[0]["last_version"]["urls"]["html"];
-            ViewBag.SelectedBill = resultBills[0];
+            var resultBill = jsonResponseBills["results"][0];
+            string billUrl = (string) resultBill["last_version"]["urls"]["html"];
+            ViewBag.SelectedBill = resultBill;
+
+            string shortTitle = (string)resultBill["short_title"];
+            string billTitle = "";
+            if(shortTitle != null)
+            {
+                billTitle = (string) resultBill["short_title"];
+            } 
+            else
+            {
+                billTitle = (string)resultBill["official_title"];
+            }
+            ApiCall newCall = new ApiCall(columnId, "Bill", billTitle, bioguideId: billId);
+            apiCalls.Add(newCall);
+            ViewBag.Calls = apiCalls;
 
             var clientBillText = new RestClient(billUrl);
             var requestBillText = new RestRequest();
@@ -136,9 +147,7 @@ namespace GovernmentInformation.Controllers
 
         public IActionResult CommitteeDetail(int columnId, string committeeId)
         {
-            ApiCall newCall = new ApiCall(columnId, "Committee", bioguideId: committeeId);
-            apiCalls.Add(newCall);
-            ViewBag.Calls = apiCalls;
+
             var clientCommittees = new RestClient("http://congress.api.sunlightfoundation.com/committees");
             var requestCommittees = new RestRequest("?apikey=" + EnvironmentVariables.CongressApiKey + "&committee_id=" + committeeId);
             var responseCommittees = new RestResponse();
@@ -149,6 +158,12 @@ namespace GovernmentInformation.Controllers
             var jsonResponseCommittees = JsonConvert.DeserializeObject<JObject>(responseCommittees.Content);
             var resultCommittee = jsonResponseCommittees["results"][0];
             ViewBag.Committee = resultCommittee;
+
+            string committeeName = (string) resultCommittee["name"];
+            ApiCall newCall = new ApiCall(columnId, "Committee", committeeName, bioguideId: committeeId);
+            apiCalls.Add(newCall);
+            ViewBag.Calls = apiCalls;
+
             bool isSubCommittee = (bool)resultCommittee["subcommittee"];
             ViewBag.IsSubCommittee = isSubCommittee;
             if (!isSubCommittee)
