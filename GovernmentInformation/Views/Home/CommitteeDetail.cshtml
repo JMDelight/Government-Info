@@ -15,11 +15,11 @@
 </ul>
 @if (ViewBag.IsSubCommittee)
 {
-    <h5>Subcommittees</h5>
     <h4>This is a subcommittee, the parent committee is @ViewBag.ParentCommittee["name"]</h4>
 }
 else
 {
+    <h5>Subcommittees</h5>
     <ul>
 
         @foreach (var committee in ViewBag.SubCommittees)

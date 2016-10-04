@@ -51,7 +51,6 @@ namespace GovernmentInformation
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                app.UseBrowserLink();
             }
             else
             {

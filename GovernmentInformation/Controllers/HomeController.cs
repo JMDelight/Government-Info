@@ -59,44 +59,60 @@ namespace GovernmentInformation.Controllers
         }
         public IActionResult LegislatorDetail(int columnId, string bioguide)
         {
-            var clientLegislator = new RestClient("http://congress.api.sunlightfoundation.com/legislators");
-            var requestLegislator = new RestRequest("?apikey=" + EnvironmentVariables.CongressApiKey + "&bioguide_id=" + bioguide);
-            var responseLegislator = new RestResponse();
-            Task.Run(async () =>
+            JToken resultLegislator;
+            JToken resultCommittees;
+            JToken resultBills;
+            int index = Legislator.retrievedLegislators.FindIndex(legislator => legislator.BioguideId == bioguide);
+            if (index >= 0)
             {
-                responseLegislator = await GetResponseContentAsync(clientLegislator, requestLegislator) as RestResponse;
-            }).Wait();
-            var jsonResponseLegislator = JsonConvert.DeserializeObject<JObject>(responseLegislator.Content);
-            var resultLegislator = jsonResponseLegislator["results"][0];
-            ViewBag.Legislator = resultLegislator;
-            string image = "https://twitter.com/" + resultLegislator["twitter_id"] + "/profile_image?size=original";
-            ViewBag.Image = image;
+                resultLegislator = Legislator.retrievedLegislators[index].JsonResponse;
+                resultCommittees = Legislator.retrievedLegislators[index].JsonResponseCommittees;
+                resultBills = Legislator.retrievedLegislators[index].JsonResponseSponsoredBills;
+            }
+            else
+            {
+                var clientLegislator = new RestClient("http://congress.api.sunlightfoundation.com/legislators");
+                var requestLegislator = new RestRequest("?apikey=" + EnvironmentVariables.CongressApiKey + "&bioguide_id=" + bioguide);
+                var responseLegislator = new RestResponse();
+                Task.Run(async () =>
+                {
+                    responseLegislator = await GetResponseContentAsync(clientLegislator, requestLegislator) as RestResponse;
+                }).Wait();
+                var jsonResponseLegislator = JsonConvert.DeserializeObject<JObject>(responseLegislator.Content);
+                resultLegislator = jsonResponseLegislator["results"][0];
 
+                var clientCommittees = new RestClient("http://congress.api.sunlightfoundation.com/committees");
+                var requestCommittees = new RestRequest("?apikey=" + EnvironmentVariables.CongressApiKey + "&per_page=all&member_ids=" + bioguide);
+                var responseCommittees = new RestResponse();
+                Task.Run(async () =>
+                {
+                    responseCommittees = await GetResponseContentAsync(clientCommittees, requestCommittees) as RestResponse;
+                }).Wait();
+                var jsonResponseCommittees = JsonConvert.DeserializeObject<JObject>(responseCommittees.Content);
+                resultCommittees = jsonResponseCommittees["results"];
+
+                var clientBills = new RestClient("http://congress.api.sunlightfoundation.com/bills");
+                var requestBills = new RestRequest("?apikey=" + EnvironmentVariables.CongressApiKey + "&per_page=all&sponsor_id=" + bioguide);
+                var responseBills = new RestResponse();
+                Task.Run(async () =>
+                {
+                    responseBills = await GetResponseContentAsync(clientBills, requestBills) as RestResponse;
+                }).Wait();
+                var jsonResponseBills = JsonConvert.DeserializeObject<JObject>(responseBills.Content);
+                resultBills = jsonResponseBills["results"];
+                Legislator foundLegislator = new Legislator(bioguide, resultLegislator, resultCommittees, resultBills);
+                Legislator.retrievedLegislators.Add(foundLegislator);
+            }
             string legislatorName = (string) resultLegislator["first_name"] + " " + (string) resultLegislator["last_name"];
             ApiCall newCall = new ApiCall(columnId, "Legislator", legislatorName, bioguideId: bioguide);
             apiCalls.Add(newCall);
+
+            string image = "https://twitter.com/" + resultLegislator["twitter_id"] + "/profile_image?size=original";
+
+            ViewBag.Legislator = resultLegislator;
+            ViewBag.Image = image;
             ViewBag.Calls = apiCalls;
-
-            var clientCommittees = new RestClient("http://congress.api.sunlightfoundation.com/committees");
-            var requestCommittees = new RestRequest("?apikey=" + EnvironmentVariables.CongressApiKey + "&per_page=all&member_ids=" + bioguide);
-            var responseCommittees = new RestResponse();
-            Task.Run(async () =>
-            {
-                responseCommittees = await GetResponseContentAsync(clientCommittees, requestCommittees) as RestResponse;
-            }).Wait();
-            var jsonResponseCommittees = JsonConvert.DeserializeObject<JObject>(responseCommittees.Content);
-            var resultCommittees = jsonResponseCommittees["results"];
             ViewBag.Committees = resultCommittees;
-
-            var clientBills = new RestClient("http://congress.api.sunlightfoundation.com/bills");
-            var requestBills = new RestRequest("?apikey=" + EnvironmentVariables.CongressApiKey + "&per_page=all&sponsor_id=" + bioguide);
-            var responseBills = new RestResponse();
-            Task.Run(async () =>
-            {
-                responseBills = await GetResponseContentAsync(clientBills, requestBills) as RestResponse;
-            }).Wait();
-            var jsonResponseBills = JsonConvert.DeserializeObject<JObject>(responseBills.Content);
-            var resultBills = jsonResponseBills["results"];
             ViewBag.Bills = resultBills;
 
             return View();
