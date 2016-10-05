@@ -15,6 +15,23 @@ $(document).ready(function () {
             }
         });
     });
+    $('body').on("submit", ".column-selector", function (event) {
+        event.preventDefault();
+        $.ajax({
+            url: '/Home/ViewHistoryLookup',
+            type: 'get',
+            data: $(this).serialize(),
+            dataType: 'html',
+            success: function (result) {
+                if (columnNumber >= 3) {
+                    $('#result' + (columnNumber - 3)).hide();
+                    $('#result-container').append('<div class="col-sm-4" id="result' + columnNumber + '"></div>');
+                }
+                $('#result' + columnNumber).html(result);
+                columnNumber++;
+            }
+        });
+    });
 });
 
 var legislatorDetail = function (id) {
@@ -31,9 +48,8 @@ var legislatorDetail = function (id) {
                 $('#result-container').append('<div class="col-sm-4" id="result' + columnNumber + '"></div>');
             }
             $('#result' + columnNumber).html(result);
-            columnNumber ++;
-            //$('span#' + id).show();
-            //$('span#' + id).html(result);
+            columnNumber++;
+            updateViewHistory();
         }
     });
 };
@@ -51,7 +67,9 @@ var committeeDetail = function (committeeId) {
                 $('#result-container').append('<div class="col-sm-4" id="result' + columnNumber + '"></div>');
             }
             $('#result' + columnNumber).html(result);
-            columnNumber ++;
+            columnNumber++;
+            updateViewHistory();
+
         }
     });
 };
@@ -69,7 +87,9 @@ var billDetail = function (billId) {
                 $('#result-container').append('<div class="col-sm-4" id="result' + columnNumber + '"></div>');
             }
             $('#result' + columnNumber).html(result);
-            columnNumber ++;
+            columnNumber++;
+            updateViewHistory();
+
         }
     });
 };
@@ -86,7 +106,21 @@ var committeeLegislatorDetail = function (id) {
                 $('#result-container').append('<div class="col-sm-4" id="result' + columnNumber + '"></div>');
             }
             $('#result' + columnNumber).html(result);
-            columnNumber ++;
+            columnNumber++;
+            updateViewHistory();
+        }
+    });
+};
+
+var updateViewHistory = function () {
+    console.log('Hi');
+    $.ajax({
+        url: '/Home/ViewHistory',
+        type: 'get',
+        dataType: 'html',
+        success: function (result) {
+            $('.view-history-form').html(result);
+            console.log("Yo");
         }
     });
 };

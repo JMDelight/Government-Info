@@ -1,0 +1,10 @@
+﻿<form class="column-selector">
+    <select name="apiId">
+        @foreach(var call in ViewBag.Calls)
+        {
+            <option value="@call.ColumnId">@call.CallType - @call.Description</option>
+
+        }
+    </select>
+    <button class="btn">Recall</button>
+</form>

@@ -2,6 +2,11 @@
     ViewData["Title"] = "Home Page";
     Layout = "_Layout";
 }
+<div class="view-history-form">
+    @Html.Partial("ViewHistory")
+</div>
+<a  onclick="updateViewHistory()">Update</a>
+
 <div class="forms">
     <div id="legislator-zip-form">
         <form class="legislator-zip" action="/Home/LocateLegislator" method="post">

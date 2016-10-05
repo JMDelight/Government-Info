@@ -27,6 +27,7 @@ namespace GovernmentInformation.Controllers
 
         public IActionResult Index()
         {
+            ViewBag.Calls = apiCalls;
             return View();
         }
         public IActionResult About()
@@ -245,6 +246,16 @@ namespace GovernmentInformation.Controllers
             var resultCommitteeMembers = jsonResponseCommitteeMembers["results"][0]["members"];
             ViewBag.CommitteeMembers = resultCommitteeMembers;
 
+            return View();
+        }
+
+        public IActionResult ViewHistory()
+        {
+            ViewBag.Calls = apiCalls;
+            return View();
+        }
+        public IActionResult ViewHistoryLookup(int apiID)
+        {
             return View();
         }
     }
