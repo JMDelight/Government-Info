@@ -1,28 +1,38 @@
 ﻿var columnNumber = 0;
 
+var setCursorWait = function () {
+    $('html,body').css('cursor', 'wait');
+
+}
+var setCursorDone = function () {
+    $('html,body').css('cursor', 'auto');
+}
+
 $(document).ready(function () {
     $('body').on("submit", ".legislator-zip", function (event) {
         event.preventDefault();
-        console.log("Hello");
+        setCursorWait();
         $.ajax({
             url: '/Home/LocateLegislator',
             type: 'GET',
             data: $(this).serialize(),
             dataType: 'html',
             success: function (result) {
-                console.log('Hello');
+            setCursorDone();
                 $('#lookup').html(result);
             }
         });
     });
     $('body').on("submit", ".column-selector", function (event) {
         event.preventDefault();
+        setCursorWait();
         $.ajax({
             url: '/Home/ViewHistoryLookup',
             type: 'get',
             data: $(this).serialize(),
             dataType: 'html',
             success: function (result) {
+            setCursorDone();
                 if (columnNumber >= 3) {
                     $('#result' + (columnNumber - 3)).hide();
                     $('#result-container').append('<div class="col-sm-4" id="result' + columnNumber + '"></div>');
@@ -36,13 +46,14 @@ $(document).ready(function () {
 
 var legislatorDetail = function (id) {
     //$('span').hide();
-    console.log(id);
+    setCursorWait();
     $.ajax({
         url: '/Home/LegislatorDetail',
         type: 'get',
         data: { columnId: columnNumber, bioguide: id },
         dataType: 'html',
         success: function (result) {
+            setCursorDone();
             if (columnNumber >= 3) {
                 $('#result' + (columnNumber - 3)).hide();
                 $('#result-container').append('<div class="col-sm-4" id="result' + columnNumber + '"></div>');
@@ -55,13 +66,14 @@ var legislatorDetail = function (id) {
 };
 
 var committeeDetail = function (committeeId) {
-    console.log(committeeId);
+    setCursorWait();
     $.ajax({
         url: '/Home/CommitteeDetail',
         type: 'get',
         data: { columnId: columnNumber, committeeId: committeeId },
         dataType: 'html',
         success: function (result) {
+            setCursorDone();
             if (columnNumber >= 3) {
                 $('#result' + (columnNumber - 3)).hide();
                 $('#result-container').append('<div class="col-sm-4" id="result' + columnNumber + '"></div>');
@@ -75,13 +87,14 @@ var committeeDetail = function (committeeId) {
 };
 
 var billDetail = function (billId) {
-    console.log(billId);
+    setCursorWait();
     $.ajax({
         url: '/Home/BillDetail',
         type: 'get',
         data: { columnId: columnNumber, billId: billId },
         dataType: 'html',
         success: function (result) {
+            setCursorDone();
             if (columnNumber >= 3) {
                 $('#result' + (columnNumber - 3)).hide();
                 $('#result-container').append('<div class="col-sm-4" id="result' + columnNumber + '"></div>');
@@ -95,12 +108,14 @@ var billDetail = function (billId) {
 };
 
 var committeeLegislatorDetail = function (id) {
+    setCursorWait();
     $.ajax({
         url: '/Home/LegislatorDetail',
         type: 'get',
         data: { columnId: columnNumber, bioguide: id },
         dataType: 'html',
         success: function (result) {
+            setCursorDone();
             if (columnNumber >= 3) {
                 $('#result' + (columnNumber - 3)).hide();
                 $('#result-container').append('<div class="col-sm-4" id="result' + columnNumber + '"></div>');
@@ -113,14 +128,14 @@ var committeeLegislatorDetail = function (id) {
 };
 
 var updateViewHistory = function () {
-    console.log('Hi');
+    setCursorWait();
     $.ajax({
         url: '/Home/ViewHistory',
         type: 'get',
         dataType: 'html',
         success: function (result) {
+            setCursorDone();
             $('.view-history-form').html(result);
-            console.log("Yo");
         }
     });
 };

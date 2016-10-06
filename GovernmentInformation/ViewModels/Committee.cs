@@ -18,7 +18,8 @@ namespace GovernmentInformation.ViewModels
         public JToken SubCommittees { get; set; }
         public DateTime RetrievalTime { get; set; }
         public JToken CommitteeMembers { get; set; }
-        public Committee(string committeeId, JToken jsonResponse, JToken committeeMembers, bool isSubCommittee, JToken subCommittees = null, string parentCommitteeId = null)
+        public JToken CommitteesBills { get; set; }
+        public Committee(string committeeId, JToken jsonResponse, JToken committeeMembers, bool isSubCommittee, JToken subCommittees = null, string parentCommitteeId = null, JToken committeesBills = null)
         {
             JsonResponse = jsonResponse;
             CommitteeId = committeeId;
@@ -26,6 +27,7 @@ namespace GovernmentInformation.ViewModels
             IsSubCommittee = isSubCommittee;
             SubCommittees = subCommittees;
             ParentCommitteeId = parentCommitteeId;
+            CommitteesBills = committeesBills;
             CommitteeMembers = committeeMembers;
         }
     }

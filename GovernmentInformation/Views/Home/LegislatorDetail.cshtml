@@ -36,11 +36,23 @@
     {
         @if (bill["short_title"] != null)
         {
-            <li><a class="bill-name" onclick="billDetail('@bill["bill_id"]')">@bill["short_title"]</a></li>
+            <li>
+                <a class="bill-name" onclick="billDetail('@bill["bill_id"]')">@bill["short_title"]</a>
+                <ul>
+                    <li>Enacted: @bill["history"]["enacted"]</li>
+                    <li>Active: @bill["history"]["active"]</li>
+                </ul>
+            </li>
         }
         else
         {
-            <li><a class="bill-name" onclick="billDetail('@bill["bill_id"]')">@bill["official_title"]</a></li>
+            <li>
+                <a class="bill-name" onclick="billDetail('@bill["bill_id"]')">@bill["official_title"]</a>
+                <ul>
+                    <li>Enacted: @bill["history"]["enacted"]</li>
+                    <li>Active: @bill["history"]["active"]</li>
+                </ul>
+            </li>
         }
     }
 </ul>

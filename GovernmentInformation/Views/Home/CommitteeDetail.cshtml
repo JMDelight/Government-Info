@@ -3,10 +3,34 @@
 <ul>
     @foreach(var member in ViewBag.CommitteeMembers)
     {
-        <li>@member["title"] <a class="bill-name" onclick="committeeLegislatorDetail('@member["legislator"]["bioguide_id"]')">@member["legislator"]["first_name"] @member["legislator"]["last_name"] </a></li>
+        <li>@member["title"] <a class="legislator-name" onclick="committeeLegislatorDetail('@member["legislator"]["bioguide_id"]')">@member["legislator"]["first_name"] @member["legislator"]["last_name"] </a></li>
 
     }
 </ul>
+@foreach (var bill in ViewBag.CommitteesBills)
+{
+
+    @if (bill == ViewBag.CommitteesBills[0])
+    {
+        <h4>Bills currently before @ViewBag.Committee["name"]</h4>
+    }
+}
+
+<ul>
+    @foreach (var bill in ViewBag.CommitteesBills)
+    {
+        @if (bill["short_title"] != null)
+        {
+            <li><a class="bill-name" onclick="billDetail('@bill["bill_id"]')">@bill["short_title"]</a></li>
+        }
+        else
+        {
+            <li><a class="bill-name" onclick="billDetail('@bill["bill_id"]')">@bill["official_title"]</a></li>
+        }
+    }
+</ul>
+
+
 @if (ViewBag.IsSubCommittee)
 {
     <h4>This is a subcommittee, the parent committee is @ViewBag.ParentCommittee["name"]</h4>

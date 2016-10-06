@@ -45,3 +45,7 @@ textarea {
 .deleted {
     text-decoration: line-through;
 }
+
+a:hover {
+    cursor: pointer;
+}
