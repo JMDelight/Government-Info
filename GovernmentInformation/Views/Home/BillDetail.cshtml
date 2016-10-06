@@ -1,7 +1,7 @@
 ﻿<h3>Official Title: <a href="@ViewBag.SelectedBill["last_version"]["urls"]["pdf"]" target="_newtab">@ViewBag.SelectedBill["official_title"]</a></h3>
 
-<div class="@string.Concat("Bill", ViewBag.ThisColumn)">
-    <button onclick="$('.@string.Concat("Bill", ViewBag.ThisColumn) p').toggle()">Reveal Bill Text</button>
+<div class="@string.Concat("bill-", ViewBag.ThisColumn)">
+    <button onclick="$('.@string.Concat("bill-", ViewBag.ThisColumn) p').toggle()">Reveal Bill Text</button>
     <p class="bill-text" style="display: none;">
         @Html.Raw(ViewBag.BillText)
     </p>

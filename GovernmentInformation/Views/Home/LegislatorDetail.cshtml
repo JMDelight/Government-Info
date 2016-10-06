@@ -1,13 +1,28 @@
-﻿@{
-}
-@foreach(var call in ViewBag.Calls)
-{
-    <h6>@call.CallType: @call.Description</h6>
+﻿<h4>@ViewBag.Legislator["title"] @ViewBag.Legislator["first_name"] @ViewBag.Legislator["last_name"] - @ViewBag.Legislator["party"] - @ViewBag.Legislator["state_name"]</h4>
+<img class="img-thumbnail" src="@ViewBag.Image" alt="A picture from a social media account of @ViewBag.Legislator["first_name"] @ViewBag.Legislator["last_name"]" />
+<p></p>
+<div class="@string.Concat("contact-", ViewBag.ThisColumn)">
+    <button onclick="$('.@string.Concat("contact-", ViewBag.ThisColumn) p').toggle()">Contact Information</button>
+    <p class="contact-info" style="display: none;">Email: <a href='mailto:@ViewBag.Legislator["oc_email"]' target="_newtab">@ViewBag.Legislator["oc_email"]</a></p>
+    <p class="contact-info" style="display: none;">Phone Number: @ViewBag.Legislator["phone"]</p>
+    <p class="contact-info" style="display: none;"><a href="@ViewBag.Legislator["contact_form"]" target="_newtab">Contact form</a></p>
+    <p class="contact-info" style="display: none;">Website: <a href="@ViewBag.Legislator["website"]" target="_newtab">@ViewBag.Legislator["website"]</a></p>
+    @if (ViewBag.Legislator["twitter_id"] != null)
+    {
+        <p class="contact-info" style="display: none;">Twitter Id: <a href='https://www.twitter.com/@ViewBag.Legislator["twitter_id"]' target="_newtab">@ViewBag.Legislator["twitter_id"]</a></p>
 
-}
+    }
+    @if (ViewBag.Legislator["facebook_id"] != null)
+    {
+        <p class="contact-info" style="display: none;"><a href='https://www.facebook.com/@ViewBag.Legislator["facebook_id"]' target="_newtab">FaceBook Account</a></p>
+    }
+    @if (ViewBag.Legislator["youtube_id"] != null)
+    {
+        <p class="contact-info" style="display: none;"><a href='https://www.youtube.com/@ViewBag.Legislator["youtube_id"]' target="_newtab">YouTube Account</a></p>
+    }
+    <p class="contact-info" style="display: none;">Offices - @ViewBag.Legislator["office"]</p>
+</div>
 
-<h4>@ViewBag.Legislator["first_name"] @ViewBag.Legislator["last_name"]</h4>
-<img class="img-thumbnail" src="@ViewBag.Image" />
 <h1>Committees</h1>
 <ul>
     @foreach (var committee in ViewBag.Committees)
@@ -15,11 +30,10 @@
         <li><a class="committee-name" onclick="committeeDetail('@committee["committee_id"]')">@committee["name"]</a></li>
     }
 </ul>
-<h3>Bills</h3>
+<h3>Sponsored Bills</h3>
 <ul>
     @foreach (var bill in ViewBag.Bills)
     {
-
         @if (bill["short_title"] != null)
         {
             <li><a class="bill-name" onclick="billDetail('@bill["bill_id"]')">@bill["short_title"]</a></li>

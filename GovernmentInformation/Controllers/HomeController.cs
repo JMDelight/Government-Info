@@ -107,15 +107,22 @@ namespace GovernmentInformation.Controllers
                 ApiCall newCall = new ApiCall(columnId, "Legislator", legislatorName, bioguideId: bioguide);
                 apiCalls.Add(newCall);
             }
-
-            string image = "https://twitter.com/" + resultLegislator["twitter_id"] + "/profile_image?size=original";
+            string image = "";
+            if (resultLegislator["twitter_id"] != null)
+            {
+                image = "https://twitter.com/" + resultLegislator["twitter_id"] + "/profile_image?size=original";
+            }
+            else if (resultLegislator["facebook_id"] != null)
+            {
+                image = "graph.facebook.com/v2.8/ " + resultLegislator["facebook_id"] + "/picture?height=200";
+            }
 
             ViewBag.Legislator = resultLegislator;
             ViewBag.Image = image;
             ViewBag.Calls = apiCalls;
             ViewBag.Committees = resultCommittees;
             ViewBag.Bills = resultBills;
-
+            ViewBag.ThisColumn = columnId;
             return View();
         }
 
@@ -314,7 +321,7 @@ namespace GovernmentInformation.Controllers
             ViewBag.Committee = resultCommittee;
             ViewBag.Calls = apiCalls;
             ViewBag.IsSubCommittee = isSubCommittee;
-
+            ViewBag.ThisColumn = columnId;
             return View();
         }
 
