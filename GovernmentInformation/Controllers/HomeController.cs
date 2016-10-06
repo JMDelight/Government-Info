@@ -103,10 +103,10 @@ namespace GovernmentInformation.Controllers
                 resultBills = jsonResponseBills["results"];
                 Legislator foundLegislator = new Legislator(bioguide, resultLegislator, resultCommittees, resultBills);
                 Legislator.retrievedLegislators.Add(foundLegislator);
+                string legislatorName = (string) resultLegislator["first_name"] + " " + (string) resultLegislator["last_name"];
+                ApiCall newCall = new ApiCall(columnId, "Legislator", legislatorName, bioguideId: bioguide);
+                apiCalls.Add(newCall);
             }
-            string legislatorName = (string) resultLegislator["first_name"] + " " + (string) resultLegislator["last_name"];
-            ApiCall newCall = new ApiCall(columnId, "Legislator", legislatorName, bioguideId: bioguide);
-            apiCalls.Add(newCall);
 
             string image = "https://twitter.com/" + resultLegislator["twitter_id"] + "/profile_image?size=original";
 
@@ -154,7 +154,7 @@ namespace GovernmentInformation.Controllers
                 }).Wait();
                 var billText = responseBillText.Content.ToString();
                 string processedBillText = Regex.Replace(billText, @"<\S*>", "");
-                string formattedBillText = Regex.Replace(processedBillText, @"_{71}", "</p><hr /><p>");
+                string formattedBillText = Regex.Replace(processedBillText, @"_{71}", "</p><hr /><p style=\"display: none; \">");
                 finishedBillText = formattedBillText.Replace("&lt;DELETED&gt;", "<span class='deleted'>").Replace("&lt;/DELETED&gt;", "</span>");
 
                 Bill foundBill = new Bill(billId, resultBill, finishedBillText);
@@ -175,7 +175,7 @@ namespace GovernmentInformation.Controllers
 
             if (index < 0)
             {
-                ApiCall newCall = new ApiCall(columnId, "Bill", billTitle, bioguideId: billId);
+                ApiCall newCall = new ApiCall(columnId, "Bill", billTitle, billId: billId);
                 apiCalls.Add(newCall);
             }
 
@@ -189,62 +189,131 @@ namespace GovernmentInformation.Controllers
 
         public IActionResult CommitteeDetail(int columnId, string committeeId)
         {
+            int index = Committee.retrievedCommittees.FindIndex(committee => committee.CommitteeId == committeeId);
+            JToken resultCommittee;
+            bool isSubCommittee;
+            JToken subCommittees;
+            JToken parentCommittee;
+            //JToken committeeMembers;
+            JToken resultCommitteeMembers;
 
-            var clientCommittees = new RestClient("http://congress.api.sunlightfoundation.com/committees");
-            var requestCommittees = new RestRequest("?apikey=" + EnvironmentVariables.CongressApiKey + "&committee_id=" + committeeId);
-            var responseCommittees = new RestResponse();
-            Task.Run(async () =>
+            if (index >= 0)
             {
-                responseCommittees = await GetResponseContentAsync(clientCommittees, requestCommittees) as RestResponse;
-            }).Wait();
-            var jsonResponseCommittees = JsonConvert.DeserializeObject<JObject>(responseCommittees.Content);
-            var resultCommittee = jsonResponseCommittees["results"][0];
-            ViewBag.Committee = resultCommittee;
-
-            string committeeName = (string) resultCommittee["name"];
-            ApiCall newCall = new ApiCall(columnId, "Committee", committeeName, bioguideId: committeeId);
-            apiCalls.Add(newCall);
-            ViewBag.Calls = apiCalls;
-
-            bool isSubCommittee = (bool)resultCommittee["subcommittee"];
-            ViewBag.IsSubCommittee = isSubCommittee;
-            if (!isSubCommittee)
-            {
-                var clientSubCommittees = new RestClient("http://congress.api.sunlightfoundation.com/committees");
-                var requestSubCommittees = new RestRequest("?apikey=" + EnvironmentVariables.CongressApiKey + "&parent_committee_id=" + committeeId);
-                var responseSubCommittees = new RestResponse();
-                Task.Run(async () =>
+                Committee foundCommittee = Committee.retrievedCommittees[index];
+                resultCommittee = foundCommittee.JsonResponse;
+                isSubCommittee = foundCommittee.IsSubCommittee;
+                resultCommitteeMembers = foundCommittee.CommitteeMembers;
+                if (!isSubCommittee)
                 {
-                    responseSubCommittees = await GetResponseContentAsync(clientSubCommittees, requestSubCommittees) as RestResponse;
-                }).Wait();
-                var jsonResponseSubCommittees = JsonConvert.DeserializeObject<JObject>(responseSubCommittees.Content);
-                var resultCommittees = jsonResponseSubCommittees["results"];
-                ViewBag.SubCommittees = resultCommittees;
+                    subCommittees = foundCommittee.SubCommittees;
+                    ViewBag.SubCommittees = subCommittees;
+                }
+                else
+                {
+                    int parentIndex = Committee.retrievedCommittees.FindIndex(committee => committee.CommitteeId == foundCommittee.ParentCommitteeId);
+                    parentCommittee = Committee.retrievedCommittees[parentIndex].JsonResponse;
+                    ViewBag.ParentCommittee = parentCommittee;
+                }
             }
             else
             {
-                var clientParentCommittee = new RestClient("http://congress.api.sunlightfoundation.com/committees");
-                var requestParentCommittee = new RestRequest("?apikey=" + EnvironmentVariables.CongressApiKey + "&committee_id=" + resultCommittee["parent_committee_id"]);
-                var responseParentCommittee = new RestResponse();
+                // Retrieve Main Committee
+                var clientCommittees = new RestClient("http://congress.api.sunlightfoundation.com/committees");
+                var requestCommittees = new RestRequest("?apikey=" + EnvironmentVariables.CongressApiKey + "&committee_id=" + committeeId);
+                var responseCommittees = new RestResponse();
                 Task.Run(async () =>
                 {
-                    responseParentCommittee = await GetResponseContentAsync(clientParentCommittee, requestParentCommittee) as RestResponse;
+                    responseCommittees = await GetResponseContentAsync(clientCommittees, requestCommittees) as RestResponse;
                 }).Wait();
-                var jsonResponseParentCommittee = JsonConvert.DeserializeObject<JObject>(responseParentCommittee.Content);
-                var resultCommittees = jsonResponseParentCommittee["results"][0];
-                ViewBag.ParentCommittee = resultCommittees;
+                var jsonResponseCommittees = JsonConvert.DeserializeObject<JObject>(responseCommittees.Content);
+                resultCommittee = jsonResponseCommittees["results"][0];
+
+                //Retrive Committee Members for Main Committee
+                var clientCommitteeMembers = new RestClient("http://congress.api.sunlightfoundation.com/committees");
+                var requestCommitteeMembers = new RestRequest("?apikey=" + EnvironmentVariables.CongressApiKey + "&fields=members&committee_id=" + committeeId);
+                var responseCommitteeMembers = new RestResponse();
+                Task.Run(async () =>
+                {
+                    responseCommitteeMembers = await GetResponseContentAsync(clientCommitteeMembers, requestCommitteeMembers) as RestResponse;
+                }).Wait();
+                var jsonResponseCommitteeMembers = JsonConvert.DeserializeObject<JObject>(responseCommitteeMembers.Content);
+                resultCommitteeMembers = jsonResponseCommitteeMembers["results"][0]["members"];
+
+
+               
+
+                // Add this to stored calls
+                string committeeName = (string) resultCommittee["name"];
+                ApiCall newCall = new ApiCall(columnId, "Committee", committeeName, committeeId: committeeId);
+                apiCalls.Add(newCall);
+
+
+                isSubCommittee = (bool)resultCommittee["subcommittee"];
+                if (!isSubCommittee)
+                {
+                    // Retrive Subcommittees for Main Committee
+                    var clientSubCommittees = new RestClient("http://congress.api.sunlightfoundation.com/committees");
+                    var requestSubCommittees = new RestRequest("?apikey=" + EnvironmentVariables.CongressApiKey + "&parent_committee_id=" + committeeId);
+                    var responseSubCommittees = new RestResponse();
+                    Task.Run(async () =>
+                    {
+                        responseSubCommittees = await GetResponseContentAsync(clientSubCommittees, requestSubCommittees) as RestResponse;
+                    }).Wait();
+                    var jsonResponseSubCommittees = JsonConvert.DeserializeObject<JObject>(responseSubCommittees.Content);
+                    var resultCommittees = jsonResponseSubCommittees["results"];
+
+                    Committee madeCommittee = new Committee(committeeId, resultCommittee, resultCommitteeMembers, false, resultCommittees);
+                    Committee.retrievedCommittees.Add(madeCommittee);
+                    ViewBag.SubCommittees = resultCommittees;
+                }
+                else
+                {
+                    // Retrieve Parent Committee
+                    var clientParentCommittee = new RestClient("http://congress.api.sunlightfoundation.com/committees");
+                    var requestParentCommittee = new RestRequest("?apikey=" + EnvironmentVariables.CongressApiKey + "&committee_id=" + resultCommittee["parent_committee_id"]);
+                    var responseParentCommittee = new RestResponse();
+                    Task.Run(async () =>
+                    {
+                        responseParentCommittee = await GetResponseContentAsync(clientParentCommittee, requestParentCommittee) as RestResponse;
+                    }).Wait();
+                    var jsonResponseParentCommittee = JsonConvert.DeserializeObject<JObject>(responseParentCommittee.Content);
+                    var jTokenParentCommittee = jsonResponseParentCommittee["results"][0];
+                    ViewBag.ParentCommittee = jTokenParentCommittee;
+
+                    //Retrive Committee Members for Parent Committee
+                    var clientParentCommitteeMembers = new RestClient("http://congress.api.sunlightfoundation.com/committees");
+                    var requestParentCommitteeMembers = new RestRequest("?apikey=" + EnvironmentVariables.CongressApiKey + "&fields=members&committee_id=" + resultCommittee["parent_committee_id"]);
+                    var responseParentCommitteeMembers = new RestResponse();
+                    Task.Run(async () =>
+                    {
+                        responseParentCommitteeMembers = await GetResponseContentAsync(clientParentCommitteeMembers, requestParentCommitteeMembers) as RestResponse;
+                    }).Wait();
+                    var jsonResponseParentCommitteeMembers = JsonConvert.DeserializeObject<JObject>(responseParentCommitteeMembers.Content);
+                    var resultParentCommitteeMembers = jsonResponseParentCommitteeMembers["results"][0]["members"];
+
+                    // Retrieve Parent Comittee's subcommittees
+                    var clientSubCommittees = new RestClient("http://congress.api.sunlightfoundation.com/committees");
+                    var requestSubCommittees = new RestRequest("?apikey=" + EnvironmentVariables.CongressApiKey + "&parent_committee_id=" + committeeId);
+                    var responseSubCommittees = new RestResponse();
+                    Task.Run(async () =>
+                    {
+                        responseSubCommittees = await GetResponseContentAsync(clientSubCommittees, requestSubCommittees) as RestResponse;
+                    }).Wait();
+                    var jsonResponseSubCommittees = JsonConvert.DeserializeObject<JObject>(responseSubCommittees.Content);
+                    var parentSubCommittees = jsonResponseSubCommittees["results"];
+
+                    Committee parentCommitteeObject = new Committee((string) resultCommittee["parent_committee_id"], jTokenParentCommittee, resultParentCommitteeMembers, false, parentSubCommittees);
+                    Committee.retrievedCommittees.Add(parentCommitteeObject);
+
+                    Committee madeCommittee = new Committee(committeeId, resultCommittee, resultCommitteeMembers, true, parentCommitteeId: parentCommitteeObject.CommitteeId);
+                    Committee.retrievedCommittees.Add(madeCommittee);
+                }
             }
 
-            var clientCommitteeMembers = new RestClient("http://congress.api.sunlightfoundation.com/committees");
-            var requestCommitteeMembers = new RestRequest("?apikey=" + EnvironmentVariables.CongressApiKey + "&fields=members&committee_id=" + committeeId);
-            var responseCommitteeMembers = new RestResponse();
-            Task.Run(async () =>
-            {
-                responseCommitteeMembers = await GetResponseContentAsync(clientCommitteeMembers, requestCommitteeMembers) as RestResponse;
-            }).Wait();
-            var jsonResponseCommitteeMembers = JsonConvert.DeserializeObject<JObject>(responseCommitteeMembers.Content);
-            var resultCommitteeMembers = jsonResponseCommitteeMembers["results"][0]["members"];
             ViewBag.CommitteeMembers = resultCommitteeMembers;
+            ViewBag.Committee = resultCommittee;
+            ViewBag.Calls = apiCalls;
+            ViewBag.IsSubCommittee = isSubCommittee;
 
             return View();
         }
@@ -256,6 +325,43 @@ namespace GovernmentInformation.Controllers
         }
         public IActionResult ViewHistoryLookup(int apiID)
         {
+            ApiCall foundApiCall = new ApiCall(-1, null, null);
+            foreach( ApiCall call in apiCalls)
+            {
+                if (call.ColumnId == apiID)
+                {
+                    foundApiCall = call;
+                }
+            }
+            if (foundApiCall.BioguideId != null)
+            {
+                return RedirectToAction("LegislatorDetail", new { columnId = -1, bioguide = foundApiCall.BioguideId });
+                //foreach( Legislator foundLegislator in Legislator.retrievedLegislators)
+                //{
+                //    if (foundLegislator.BioguideId == foundApiCall.BioguideId)
+                //    {
+                //        var resultLegislator = foundLegislator.JsonResponse;
+                //        var resultCommittees = foundLegislator.JsonResponseCommittees;
+                //        var resultBills = foundLegislator.JsonResponseSponsoredBills;
+                //        string image = "https://twitter.com/" + resultLegislator["twitter_id"] + "/profile_image?size=original";
+                //        ViewBag.Legislator = resultLegislator;
+                //        ViewBag.Image = image;
+                //        ViewBag.Calls = apiCalls;
+                //        ViewBag.Committees = resultCommittees;
+                //        ViewBag.Bills = resultBills;
+
+                //        return View("LegislatorDetail");
+                //    }
+                //}
+            }
+            else if(foundApiCall.BillID != null)
+            {
+                return RedirectToAction("BillDetail", new { columnId = -1, billId = foundApiCall.BillID });
+            }
+            else if (foundApiCall.CommitteeId != null)
+            {
+                return RedirectToAction("CommitteeDetail", new { columnId = -1, committeeId = foundApiCall.CommitteeId });
+            }
             return View();
         }
     }

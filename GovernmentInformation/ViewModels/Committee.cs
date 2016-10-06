@@ -12,14 +12,21 @@ namespace GovernmentInformation.ViewModels
         public static List<Committee> retrievedCommittees = new List<Committee> { };
 
         public string CommitteeId { get; set; }
-        public JObject JsonRespone { get; set; }
-        public string CommitteeText { get; set; }
+        public JToken JsonResponse { get; set; }
+        public string ParentCommitteeId { get; set; }
+        public bool IsSubCommittee { get; set; }
+        public JToken SubCommittees { get; set; }
         public DateTime RetrievalTime { get; set; }
-        public Committee(string committeeId, JObject jsonResponse)
+        public JToken CommitteeMembers { get; set; }
+        public Committee(string committeeId, JToken jsonResponse, JToken committeeMembers, bool isSubCommittee, JToken subCommittees = null, string parentCommitteeId = null)
         {
-            JsonRespone = jsonResponse;
+            JsonResponse = jsonResponse;
             CommitteeId = committeeId;
             RetrievalTime = DateTime.Now;
+            IsSubCommittee = isSubCommittee;
+            SubCommittees = subCommittees;
+            ParentCommitteeId = parentCommitteeId;
+            CommitteeMembers = committeeMembers;
         }
     }
 }
