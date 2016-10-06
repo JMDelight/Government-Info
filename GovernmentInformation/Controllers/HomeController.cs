@@ -220,8 +220,21 @@ namespace GovernmentInformation.Controllers
                 else
                 {
                     int parentIndex = Committee.retrievedCommittees.FindIndex(committee => committee.CommitteeId == foundCommittee.ParentCommitteeId);
-                    parentCommittee = Committee.retrievedCommittees[parentIndex].JsonResponse;
-                    ViewBag.ParentCommittee = parentCommittee;
+                    //parentCommittee = Committee.retrievedCommittees[parentIndex].JsonResponse;
+                    //
+                    // Retrieve Parent Committee Re retrieve due to issues with linked committees currently
+                    var clientParentCommittee = new RestClient("http://congress.api.sunlightfoundation.com/committees");
+                    var requestParentCommittee = new RestRequest("?apikey=" + EnvironmentVariables.CongressApiKey + "&committee_id=" + resultCommittee["parent_committee_id"]);
+                    var responseParentCommittee = new RestResponse();
+                    Task.Run(async () =>
+                    {
+                        responseParentCommittee = await GetResponseContentAsync(clientParentCommittee, requestParentCommittee) as RestResponse;
+                    }).Wait();
+                    var jsonResponseParentCommittee = JsonConvert.DeserializeObject<JObject>(responseParentCommittee.Content);
+                    var jTokenParentCommittee = jsonResponseParentCommittee["results"][0];
+                    ViewBag.ParentCommittee = jTokenParentCommittee;
+
+                    //ViewBag.ParentCommittee = parentCommittee;
                 }
             }
             else
