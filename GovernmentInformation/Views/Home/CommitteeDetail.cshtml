@@ -33,7 +33,7 @@
 
 @if (ViewBag.IsSubCommittee)
 {
-    <h4>This is a subcommittee, the parent committee is @ViewBag.ParentCommittee["name"]</h4>
+    <h4>This is a subcommittee, the parent committee is <a class="committee-name" onclick="committeeDetail('@ViewBag.ParentCommittee["committee_id"]')">@ViewBag.ParentCommittee["name"]</a></h4>
 }
 else
 {
@@ -42,7 +42,7 @@ else
 
         @foreach (var committee in ViewBag.SubCommittees)
         {
-            <li>@committee["name"]</li>
+            <li><a class="committee-name" onclick="committeeDetail('@committee["committee_id"]')">@committee["name"] </a></li>
         }
     </ul>
 }
