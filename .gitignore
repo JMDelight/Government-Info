@@ -81,7 +81,7 @@ ipch/
 *.sdf
 *.cachefile
 *.VC.db
-EnviornmentVariables.cs
+GovernmentInformation/Models/EnviornmentVariables.cs
 
 
 # Visual Studio profiler
