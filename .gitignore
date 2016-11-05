@@ -81,6 +81,8 @@ ipch/
 *.sdf
 *.cachefile
 *.VC.db
+EnviornmentVariables.cs
+
 
 # Visual Studio profiler
 *.psess

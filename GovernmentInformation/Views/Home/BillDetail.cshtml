@@ -1,5 +1,5 @@
 ﻿<h3>Official Title: <a href="@ViewBag.SelectedBill["last_version"]["urls"]["pdf"]" target="_newtab">@ViewBag.SelectedBill["official_title"]</a></h3>
-<h5>Sponsored by <a class="legislator-name" onclick="legislatorDetail('@item["bioguide_id"]')">@ViewBag.SelectedBill["sponsor"]["title"] @ViewBag.SelectedBill["sponsor"]["first_name"] @ViewBag.SelectedBill["sponsor"]["last_name"] </a></h5>
+<h5>Sponsored by <a class="legislator-name" onclick="legislatorDetail('@ViewBag.SelectedBill["sponsor_id"]')">@ViewBag.SelectedBill["sponsor"]["title"] @ViewBag.SelectedBill["sponsor"]["first_name"] @ViewBag.SelectedBill["sponsor"]["last_name"] </a></h5>
 <div class="@string.Concat("bill-", ViewBag.ThisColumn)">
     <button onclick="$('.@string.Concat("bill-", ViewBag.ThisColumn) p').toggle()">Reveal Bill Text</button>
     <p class="bill-text" style="display: none;">
