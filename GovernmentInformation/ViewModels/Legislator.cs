@@ -12,13 +12,15 @@ namespace GovernmentInformation.ViewModels
 
         public string BioguideId { get; set; }
         public JToken JsonResponse { get; set; }
+        public JToken JsonResponseFunding { get; set; }
         public JToken JsonResponseCommittees { get; set; }
         public JToken JsonResponseSponsoredBills { get; set; }
         public DateTime RetrievalTime { get; set; }
-        public Legislator(string bioguideId, JToken jsonResponse, JToken jsonResponeCommittees, JToken jsonResponseSponsoredBills)
+        public Legislator(string bioguideId, JToken jsonResponse, JToken jsonResponseFunding,JToken jsonResponeCommittees, JToken jsonResponseSponsoredBills)
         {
             BioguideId = bioguideId;
             JsonResponse = jsonResponse;
+            JsonResponseFunding = jsonResponseFunding;
             JsonResponseCommittees = jsonResponeCommittees;
             JsonResponseSponsoredBills = jsonResponseSponsoredBills;
             RetrievalTime = DateTime.Now;

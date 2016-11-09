@@ -23,6 +23,20 @@
     <p class="contact-info" style="display: none;">Offices - @ViewBag.Legislator["office"]</p>
 </div>
 
+<h1>Recent Funding</h1>
+<ul>
+    @foreach (var funding in ViewBag.LegislatorFunding["industry"])
+    {
+        <li>@funding["@attributes"]["industry_name"]
+            <ul>
+                <li>$@funding["@attributes"]["total"]</li>
+            </ul>
+        </li>
+        
+
+    }
+</ul>
+
 <h1>Committees</h1>
 <ul>
     @foreach (var committee in ViewBag.Committees)

@@ -61,12 +61,14 @@ namespace GovernmentInformation.Controllers
         public IActionResult LegislatorDetail(int columnId, string bioguide)
         {
             JToken resultLegislator;
+            JToken resultLegislatorFunding;
             JToken resultCommittees;
             JToken resultBills;
             int index = Legislator.retrievedLegislators.FindIndex(legislator => legislator.BioguideId == bioguide);
             if (index >= 0)
             {
                 resultLegislator = Legislator.retrievedLegislators[index].JsonResponse;
+                resultLegislatorFunding = Legislator.retrievedLegislators[index].JsonResponseFunding;
                 resultCommittees = Legislator.retrievedLegislators[index].JsonResponseCommittees;
                 resultBills = Legislator.retrievedLegislators[index].JsonResponseSponsoredBills;
             }
@@ -81,6 +83,16 @@ namespace GovernmentInformation.Controllers
                 }).Wait();
                 var jsonResponseLegislator = JsonConvert.DeserializeObject<JObject>(responseLegislator.Content);
                 resultLegislator = jsonResponseLegislator["results"][0];
+
+                var clientLegislatorFunding = new RestClient("https://www.opensecrets.org/api");
+                var requestLegislatorFunding = new RestRequest("?method=candIndustry&output=json&cycle=2016&cid=" + resultLegislator["crp_id"] + "&apikey=" + EnvironmentVariables.OpenSecretsApiKey);
+                var responseLegislatorFunding = new RestResponse();
+                Task.Run(async () =>
+                {
+                    responseLegislatorFunding = await GetResponseContentAsync(clientLegislatorFunding, requestLegislatorFunding) as RestResponse;
+                }).Wait();
+                var jsonResponseFunding = JsonConvert.DeserializeObject<JObject>(responseLegislatorFunding.Content);
+                resultLegislatorFunding = jsonResponseFunding["response"];
 
                 var clientCommittees = new RestClient("http://congress.api.sunlightfoundation.com/committees");
                 var requestCommittees = new RestRequest("?apikey=" + EnvironmentVariables.CongressApiKey + "&per_page=all&member_ids=" + bioguide);
@@ -101,7 +113,7 @@ namespace GovernmentInformation.Controllers
                 }).Wait();
                 var jsonResponseBills = JsonConvert.DeserializeObject<JObject>(responseBills.Content);
                 resultBills = jsonResponseBills["results"];
-                Legislator foundLegislator = new Legislator(bioguide, resultLegislator, resultCommittees, resultBills);
+                Legislator foundLegislator = new Legislator(bioguide, resultLegislator, resultLegislatorFunding, resultCommittees, resultBills);
                 Legislator.retrievedLegislators.Add(foundLegislator);
                 string legislatorName = (string) resultLegislator["first_name"] + " " + (string) resultLegislator["last_name"];
                 ApiCall newCall = new ApiCall(columnId, "Legislator", legislatorName, bioguideId: bioguide);
@@ -118,6 +130,8 @@ namespace GovernmentInformation.Controllers
             }
 
             ViewBag.Legislator = resultLegislator;
+            ViewBag.LegislatorFunding = resultLegislatorFunding["industries"];
+            var abc = resultLegislatorFunding["industries"];
             ViewBag.Image = image;
             ViewBag.Calls = apiCalls;
             ViewBag.Committees = resultCommittees;
@@ -200,7 +214,7 @@ namespace GovernmentInformation.Controllers
             JToken resultCommittee;
             bool isSubCommittee;
             JToken subCommittees;
-            JToken parentCommittee;
+            //JToken parentCommittee;
             //JToken committeeMembers;
             JToken resultCommitteeMembers;
             JToken resultBills;
@@ -411,3 +425,5 @@ namespace GovernmentInformation.Controllers
         }
     }
 }
+
+

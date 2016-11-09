@@ -6,6 +6,7 @@
 *.user
 *.userosscache
 *.sln.docstates
+GovernmentInformation/Models/EnvironmentVariables.cs
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
@@ -81,7 +82,7 @@ ipch/
 *.sdf
 *.cachefile
 *.VC.db
-GovernmentInformation/Models/EnviornmentVariables.cs
+
 
 
 # Visual Studio profiler
@@ -142,7 +143,7 @@ publish/
 *.[Pp]ublish.xml
 *.azurePubxml
 
-# TODO: Un-comment the next line if you do not want to checkin 
+# TODO: Un-comment the next line if you do not want to checkin
 # your web deploy settings because they may include unencrypted
 # passwords
 #*.pubxml
