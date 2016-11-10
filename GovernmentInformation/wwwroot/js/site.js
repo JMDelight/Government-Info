@@ -18,7 +18,7 @@ $(document).ready(function () {
             data: $(this).serialize(),
             dataType: 'html',
             success: function (result) {
-            setCursorDone();
+                setCursorDone();
                 $('#lookup').html(result);
             }
         });
@@ -32,7 +32,7 @@ $(document).ready(function () {
             data: $(this).serialize(),
             dataType: 'html',
             success: function (result) {
-            setCursorDone();
+                setCursorDone();
                 if (columnNumber >= 3) {
                     $('#result' + (columnNumber - 3)).hide();
                     $('#result-container').append('<div class="col-sm-4" id="result' + columnNumber + '"></div>');
